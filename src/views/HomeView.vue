@@ -1,21 +1,21 @@
 <template>
   <div class="home">
-    <HelloWorld msg="Hello!"/>
+    <Arithmetic msg="Hello!"/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/ArithmeticOperations.vue'
+import Arithmetic from '@/components/ArithmeticOperations.vue'
 
 export default {
   name: 'HomeView',
   components: {
-    HelloWorld
+    Arithmetic  
   },
   data(){
     return {
-      name: ''
+      // name: ''
     }
   }
 }

@@ -1,23 +1,25 @@
 <template>
-  <div class="hello">
-    <button @click="display">{{nameClick ? "Cancel" : "Display name"}}</button>
-    <button @click="arith">{{arithClick ? "Cancel" : "Arithmetic Operations"}}</button>
-    <div v-if="nameClick">
-      <h2>Display name</h2>
-      <input type="text" v-model="name"><br><br>
-      <p>Hello {{name}}!</p><br><br>
-    </div>
-    <div v-if="arithClick">
-      <h2>Arithmetic Operations</h2>
-      <input type="number" v-model="number1" placeholder="Number 1"><br><br>
-      <input type="number" v-model="number2" placeholder="Number 2"><br><br>
-      <button @click="add">Add</button>
-      <button @click="sub">Subtract</button>
-      <button @click="mul">Multiply</button>
-      <button @click="div">Divide</button>
-      <p v-if="result>0" class="positive">{{ resultString }} {{ result }}</p>
-      <p v-else-if="result<0" class="negative">{{ resultString }} {{ result }}</p>
-      <p v-else>{{ resultString }}{{result}}</p>
+  <div>
+    <div class="hello">
+      <button @click="display">{{nameClick ? "Cancel" : "Display name"}}</button>
+      <button @click="arith">{{arithClick ? "Cancel" : "Arithmetic Operations"}}</button>
+      <div v-if="nameClick">
+        <h2>Display name</h2>
+        <input type="text" v-model="name"><br><br>
+        <p>Hello {{name}}!</p><br><br>
+      </div>
+      <div v-if="arithClick">
+        <h2>Arithmetic Operations</h2>
+        <input type="number" v-model="number1" placeholder="Number 1"><br><br>
+        <input type="number" v-model="number2" placeholder="Number 2"><br><br>
+        <button @click="add">Add</button>
+        <button @click="sub">Subtract</button>
+        <button @click="mul">Multiply</button>
+        <button @click="div">Divide</button>
+        <p v-if="result>0" class="positive">{{ resultString }} {{ result }}</p>
+        <p v-else-if="result<0" class="negative">{{ resultString }} {{ result }}</p>
+        <p v-else>{{ resultString }}{{result}}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -69,6 +71,8 @@ export default {
     arith(){
       this.arithClick = !this.arithClick
       this.nameClick = false 
+      this.resultString = ''
+      this.result = ''
     }
   }
 }
@@ -99,6 +103,9 @@ button{
 }
 div{
   margin-top: 5%;
+}
+button{
+  font-size: medium;
 }
 .positive{
   color: blue; 
