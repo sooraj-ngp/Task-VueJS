@@ -44,12 +44,14 @@ export default {
   methods:{
     add(){
       this.result = (Number(this.number1)+Number(this.number2))
-      console.log(this.result);
+      // console.log(this.result);
       this.resultString = "Sum :"
+      return this.result
     },
     sub(){
       this.result = (this.number1-this.number2)
       this.resultString = "Difference :"
+      return this.result
     },
     mul(){
       this.result = (this.number1*this.number2)
@@ -67,12 +69,15 @@ export default {
     display(){
       this.nameClick = !this.nameClick
       this.arithClick = false
+      this.name = ''
     },
     arith(){
       this.arithClick = !this.arithClick
       this.nameClick = false 
       this.resultString = ''
       this.result = ''
+      this.number1 = ''
+      this.number2 = ''
     }
   }
 }
@@ -80,20 +85,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 p{
   font-weight: bold;
   font-size: larger;
