@@ -2,7 +2,6 @@
   <!-- <hello-world /> -->
   <div>
     <v-card
-      :key="n"
       class="pa-2 card"
       max-width="400"
       outlined
@@ -18,6 +17,7 @@
       ></v-text-field>
       <v-text-field
         v-model="email"
+        v-on:keyup.enter="generatePassword"
         :rules="rules.email"
         color="blue darken-2"
         label="Email"
@@ -40,7 +40,7 @@
         outlined
       ></v-text-field>
       Gender:
-      <v-radio-group v-model="radioGroup" >
+      <v-radio-group v-model="gender" required>
         <v-row>
           <v-col>
             <v-radio
@@ -82,15 +82,25 @@
       </v-row>
       <v-combobox
         v-model="location"
-        :items="items"
+        :rules="rules.location"
+        :items="locations"
         label="Location"
-        
+        clearable
         outlined
       ></v-combobox>
-
+      <v-row>
+        <v-col></v-col>
+        <v-col>
+          <v-btn
+            elevation="4"
+            color="primary"
+            :disabled="isButtonDisabled"
+            @click="submit"
+          >Submit</v-btn>
+        </v-col>
+        <v-col></v-col>
+      </v-row>
       </v-card>
-
-      <!-- <button @click="add">Submit</button> -->
   </div>
 </template>
 
@@ -102,23 +112,75 @@ export default {
       name: '',
       email: '',
       passwordLength: '',
+      password: '',
+      buttonView: false,
+      location: '',
+      gender: [],
       selected: [],
       rules: {
-        name: [val => (val || '').length > 0 || 'This field is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'Name must be in alphabets only'],
-        email: [val => (val || '').length > 0 || 'This field is required', val => !val || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
-        passwordLength: [val => (val|| '').length > 0 || 'This field is required', val => (7 < (val)) && ((val) < 21) || 'Password length must be between 8 and 20']
+        name: [val => (val || '').length > 0 || 'This field is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'This field must be in alphabets only'],
+        email: [val => (val || '').length > 0 || 'This field is required', val => (!val) || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
+        passwordLength: [val => (val|| '').length > 0 || 'This field is required', val => (!val) || /^[0-9]*$/.test(val) || 'This field must be in numbers only', val => (7 < (val)) && ((val) < 21) || 'Password length must be between 8 and 20'],
+        location: [val => (val || '').length > 0 || 'This field is required']
       },
-      location: [],
-      items: [
+      locations: [
         'Chennai',
         'Bangalore',
         'Hyderabad'
       ],
     }
   },
+  computed:{
+    isButtonDisabled() {
+      return (
+        this.name.length === 0 ||
+        this.email.length === 0 ||
+        this.passwordLength.length === 0 ||
+        this.gender.length === 0 ||
+        this.selected.length === 0 ||
+        this.location.length === 0 
+      )
+    }
+  },
+  watch:{
+    passwordLength(value){
+      this.passwordLength = value
+      if(value<8 || value>20 || /^[a-zA-Z\s]*$/.test(value)){
+        this.password = ''
+      }
+      else{
+        this.generatePassword()
+      }
+    }
+  },
   
   methods:{
-    
+    submit(){
+      alert('Submit button clicked')
+    },
+    generatePassword(){
+      // console.log("password");
+      const Allowed = {
+        Uppers: "QWERTYUIOPASDFGHJKLZXCVBNM",
+        Lowers: "qwertyuiopasdfghjklzxcvbnm",
+        Numbers: "1234567890",
+        Symbols: "!@#$%^&*"
+      }
+
+      const getRandomCharFromString = (str) => str.charAt(Math.floor(Math.random() * str.length))
+
+      const generate = (length = this.passwordLength) => { // password will be @Param-length, default to 8, and have at least one upper, one lower, one number and one symbol
+        let pwd = "";
+        pwd += getRandomCharFromString(Allowed.Uppers); //pwd will have at least one upper
+        pwd += getRandomCharFromString(Allowed.Lowers); //pwd will have at least one lower
+        pwd += getRandomCharFromString(Allowed.Numbers); //pwd will have at least one number
+        pwd += getRandomCharFromString(Allowed.Symbols);//pwd will have at least one symbolo
+        for (let i = pwd.length; i < length; i++)
+            pwd += getRandomCharFromString(Object.values(Allowed).join('')); //fill the rest of the pwd with random characters
+        return pwd
+      }
+      this.password = generate(this.passwordLength)
+    }
   }
 }
  // import HelloWorld from '../components/ArithmeticOperations'
