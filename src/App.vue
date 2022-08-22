@@ -37,7 +37,7 @@
       </v-btn>
     </v-app-bar> -->
 
-    <v-main>
+    <v-main class="body">
       <router-view/>
     </v-main>
   </v-app>
@@ -53,3 +53,9 @@ export default {
   }),
 };
 </script>
+
+<style>
+.body{
+  background-color: black;
+}
+</style>
