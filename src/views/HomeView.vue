@@ -161,6 +161,7 @@ export default {
         location: [val => (val || '').length > 0 || 'This field is required']
       },
       locations: ['Chennai','Bangalore','Hyderabad','Pune','Mumbai','Delhi','Kolkata'],
+      detail: [],
       userDetails: [],
     }
   },
@@ -201,24 +202,25 @@ export default {
   
   methods:{
     view(){
+      this.userDetails = localStorage.getItem('userDetails')
       console.log(this.userDetails)
     },
     submit(){
-      alert('Submit button clicked')
-      this.userDetails.push({
+      this.detail.push({
         name: this.name,
         email: this.email,
         gender: this.gender,
         interests: this.interests,
         location: this.location
       })
-      this.name= ''
-      this.email= ''
-      this.passwordLength= ''
-      this.location= ''
-      this.gender= []
-      this.interests= []
-      
+      localStorage.setItem('userDetails',JSON.stringify(this.detail))
+      alert('Form Submitted!')
+      this.name = ''
+      this.email = ''
+      this.passwordLength = ''
+      this.location = ''
+      this.gender = []
+      this.interests = []
     },
     clear(){
       window.location.reload()
