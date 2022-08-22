@@ -42,6 +42,7 @@
       Gender:
       <v-radio-group v-model="gender" required>
         <v-row>
+          <v-col></v-col>
           <v-col>
             <v-radio
               label="Male"
@@ -54,10 +55,12 @@
               value="radio-female"
             ></v-radio>
           </v-col>
+          <v-col></v-col>
         </v-row>
       </v-radio-group>
       Hobbies:
       <v-row>
+        <v-col></v-col>
         <v-col>
           <v-checkbox
             v-model="selected"
@@ -79,6 +82,7 @@
             value="Gaming"
           ></v-checkbox>
         </v-col>
+        <v-col></v-col>
       </v-row>
       <v-combobox
         v-model="location"
