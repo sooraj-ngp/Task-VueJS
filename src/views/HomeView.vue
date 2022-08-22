@@ -63,21 +63,21 @@
         <v-col></v-col>
         <v-col>
           <v-checkbox
-            v-model="selected"
+            v-model="interests"
             label="Movies"
             value="Movies"
           ></v-checkbox>
         </v-col>
         <v-col>
           <v-checkbox
-            v-model="selected"
+            v-model="interests"
             label="Series"
             value="Series"
           ></v-checkbox>
         </v-col>
         <v-col>
           <v-checkbox
-            v-model="selected"
+            v-model="interests"
             label="Gaming"
             value="Gaming"
           ></v-checkbox>
@@ -104,7 +104,7 @@
         </v-col>
         <v-col></v-col>
       </v-row>
-      </v-card>
+    </v-card>
   </div>
 </template>
 
@@ -120,18 +120,14 @@ export default {
       buttonView: false,
       location: '',
       gender: [],
-      selected: [],
+      interests: [],
       rules: {
         name: [val => (val || '').length > 0 || 'This field is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'This field must be in alphabets only'],
         email: [val => (val || '').length > 0 || 'This field is required', val => (!val) || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
         passwordLength: [val => (val|| '').length > 0 || 'This field is required', val => (!val) || /^[0-9]*$/.test(val) || 'This field must be in numbers only', val => (7 < (val)) && ((val) < 21) || 'Password length must be between 8 and 20'],
         location: [val => (val || '').length > 0 || 'This field is required']
       },
-      locations: [
-        'Chennai',
-        'Bangalore',
-        'Hyderabad'
-      ],
+      locations: ['Chennai','Bangalore','Hyderabad','Pune','Mumbai','Delhi','Kolkata'],
     }
   },
   computed:{
@@ -141,7 +137,7 @@ export default {
         this.email.length === 0 ||
         this.passwordLength.length === 0 ||
         this.gender.length === 0 ||
-        this.selected.length === 0 ||
+        this.interests.length === 0 ||
         this.location.length === 0 
       )
     }
@@ -161,6 +157,7 @@ export default {
   methods:{
     submit(){
       alert('Submit button clicked')
+      window.location.reload()
     },
     generatePassword(){
       // console.log("password");
@@ -186,6 +183,7 @@ export default {
       this.password = generate(this.passwordLength)
     }
   }
+
 }
  // import HelloWorld from '../components/ArithmeticOperations'
 
