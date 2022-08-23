@@ -143,8 +143,7 @@
                 elevation="4"
                 color="primary"
                 :disabled="isResetDisabled"
-                
-                @click="clear"
+                @click="$refs.form.reset()"
               >Reset</v-btn>
             </v-col>
             <v-col></v-col>
@@ -155,14 +154,7 @@
       </v-col>
       <v-col cols="auto">
         <v-row>
-          <!-- <v-btn
-          @click="view"
-          class="table">
-            View
-          </v-btn> -->
-        </v-row>
-        <v-row>
-          <v-simple-table class="table" :headers="headers">
+          <v-simple-table class="table">
             <template v-slot:default>
               <thead>
                 <tr>
@@ -200,7 +192,7 @@
                   <td>
                     <v-btn
                     depressed
-                    @click="edit">
+                    @click="editUser(index)">
                         <v-icon>{{ icons.mdiPencil }}</v-icon>
                     </v-btn>
                   </td>
@@ -244,47 +236,31 @@ export default {
       alertMessage: false,
       valid: true,
       location: '',
-      count: 0,
       gender: '',
       interests: [],
       snackbar: false,
       rules: {
-        name: [val => (val || '').length > 0 || 'This field is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'This field must be in alphabets only'],
-        email: [val => (val || '').length > 0 || 'This field is required', val => (!val) || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
-        passwordLength: [val => (val|| '').length > 0 || 'This field is required', val => (!val) || /^[0-9]*$/.test(val) || 'This field must be in numbers only', val => (7 < (val)) && ((val) < 21) || 'Password length must be between 8 and 20'],
-        location: [val => (val || '').length > 0 || 'This field is required'], 
+        name: [val => (val || '').length > 0 || 'Name is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'This field must be in alphabets only'],
+        email: [val => (val || '').length > 0 || 'Email is required', val => (!val) || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
+        passwordLength: [val => (val|| '').length > 0 || 'Password is required', val => (!val) || /^[0-9]+$/.test(val) || 'This field must be in numbers only', val => (7 < (val)) && ((val) < 21) || 'Password length must be between 8 and 20'],
+        location: [val => (val || '').length > 0 || 'Location is required'], 
       },
       locations: ['Chennai','Bangalore','Hyderabad','Pune','Mumbai','Delhi','Kolkata'],
       details: [],
       userDetails: [],
-      headers: [
-        { text: "S.No", value: "name", width: "20%" },
-        { text: "Calories", value: "calories", width: "50%" },
-        { text: "Fat (g)", value: "fat" },
-        { text: "Carbs (g)", value: "carbs", width: "200px" },
-      ],
+      
     }
   },
   computed:{
     isSubmitDisabled() {
-      return (
-        this.name.length === 0 ||
-        this.email.length === 0 ||
-        this.passwordLength.length === 0 ||
-        this.gender.length === 0 ||
-        this.interests.length === 0 ||
-        this.location.length === 0 
-      )
+      if(!this.name || !this.email || !this.passwordLength || !this.gender || !this.location || this.interests.length === 0){
+        return true
+      } else return false
     },
     isResetDisabled() {
-      return (
-        this.name.length === 0 &&
-        this.email.length === 0 &&
-        this.passwordLength.length === 0 &&
-        this.gender.length === 0 &&
-        this.interests.length === 0 &&
-        this.location.length === 0 
-      )
+      if(!this.name && !this.email && !this.passwordLength && !this.gender && !this.location && this.interests.length === 0){
+        return true
+      } else return false
     }
 
   },
@@ -304,7 +280,8 @@ export default {
     view(){
       console.log(this.userDetails)
     },
-    submit(){    
+    submit(){ 
+      // console.log(this.interests.length);   
       // this.alertMessage = false 
       if(!this.$refs.form.validate()){
         console.log('error');
@@ -312,9 +289,7 @@ export default {
       }
       else{
         this.snackbar = false
-        this.count+=1
         this.details.push({
-          count: this.count,
           name: this.name,
           email: this.email,
           gender: this.gender,
@@ -327,8 +302,14 @@ export default {
     deleteUser(id){
       this.details.splice(id,1)
     },
-    clear(){
-      this.$refs.form.reset()
+    editUser(id){
+      // console.log(this.details[id].name);
+      this.name = this.details[id].name;
+      // console.log(this.name,"name")
+      this.email = this.details[id].email
+      this.location = this.details[id].location
+      this.gender = this.details[id].gender
+      this.interests = this.details[id].interests
     },
     generatePassword(){
       // console.log("password");
