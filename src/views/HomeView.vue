@@ -188,24 +188,26 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="detail in details"
-                  :key="detail.name"
+                  v-for="(entry, index) in details"
+                  :key="index"
                 >
-                  <td>{{ detail.count }}</td>
-                  <td>{{ detail.name }}</td>
-                  <td>{{ detail.email }}</td>
-                  <td>{{ detail.gender }}</td>
-                  <td>{{ detail.interests }}</td>
-                  <td>{{ detail.location }}</td>
+                  <td>{{ index+1 }}</td>
+                  <td>{{ entry.name }}</td>
+                  <td>{{ entry.email }}</td>
+                  <td>{{ entry.gender }}</td>
+                  <td>{{ entry.interests }}</td>
+                  <td>{{ entry.location }}</td>
                   <td>
                     <v-btn
-                    depressed>
+                    depressed
+                    @click="edit">
                         <v-icon>{{ icons.mdiPencil }}</v-icon>
                     </v-btn>
                   </td>
                   <td>
                     <v-btn
-                    depressed>
+                    depressed
+                    @click="deleteUser(index)">
                       <v-icon>{{ icons.mdiDelete }}</v-icon>
                     </v-btn>
                     </td>
@@ -319,14 +321,11 @@ export default {
           interests: this.interests,
           location: this.location
         })
-        // alert('Form Submitted!')
-        this.name = ''
-        this.email = ''
-        this.passwordLength = ''
-        this.location = ''
-        this.gender = []
-        this.interests = []
+        this.$refs.form.reset()
       }
+    },
+    deleteUser(id){
+      this.details.splice(id,1)
     },
     clear(){
       this.$refs.form.reset()
