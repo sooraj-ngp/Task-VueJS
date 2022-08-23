@@ -2,7 +2,8 @@
   <!-- <hello-world /> -->
   <div>
     <v-row>
-      <v-col>
+      <v-col
+      cols="4">
         <v-card
           class="pa-2 card"
           max-width="450"
@@ -10,6 +11,23 @@
           outlined
           tile
         >
+        <v-snackbar
+            v-model="snackbar"
+            :timeout="3000">
+            Enter a valid input
+            <template v-slot:action="{ attrs }">
+              <v-btn
+                color="blue"
+                text
+                v-bind="attrs"
+                @click="snackbar = false"
+              >close</v-btn>
+            </template>
+          </v-snackbar>
+          <v-form
+            ref="form"
+            v-model="valid"
+            lazy-validation>
           <v-text-field
             v-model="name"
             :rules="rules.name"
@@ -42,6 +60,15 @@
             readonly
             outlined
           ></v-text-field>
+
+          <v-combobox
+            v-model="location"
+            :rules="rules.location"
+            :items="locations"
+            label="Location"
+            clearable
+            outlined
+          ></v-combobox>
           Gender:
           <v-radio-group v-model="gender" required>
             <v-row>
@@ -49,13 +76,13 @@
               <v-col>
                 <v-radio
                   label="Male"
-                  value="radio-male"
+                  value="Male"
                 ></v-radio>
               </v-col>
               <v-col>
                 <v-radio
                   label="Female"
-                  value="radio-female"
+                  value="Female"
                 ></v-radio>
               </v-col>
               <v-col></v-col>
@@ -100,14 +127,6 @@
               ></v-checkbox>
             </v-col>
           </v-row>
-          <v-combobox
-            v-model="location"
-            :rules="rules.location"
-            :items="locations"
-            label="Location"
-            clearable
-            outlined
-          ></v-combobox>
           <v-row>
             <v-col></v-col>
             <v-col>
@@ -117,6 +136,7 @@
                 :disabled="isSubmitDisabled"
                 @click="submit"
               >Submit</v-btn>
+              
             </v-col>
             <v-col>
               <v-btn
@@ -130,39 +150,117 @@
             <v-col></v-col>
           </v-row>
           <v-row></v-row>
+          </v-form>
         </v-card>
       </v-col>
-      <v-col>
-        <v-btn
-        @click="view">
-          View
-        </v-btn>
+      <v-col cols="auto">
+        <v-row>
+          <!-- <v-btn
+          @click="view"
+          class="table">
+            View
+          </v-btn> -->
+        </v-row>
+        <v-row>
+          <v-simple-table class="table" :headers="headers">
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">
+                    S.No
+                  </th>
+                  <th class="text-left">
+                    Name
+                  </th>
+                  <th class="text-left">
+                    Email
+                  </th>
+                  <th class="text-left">
+                    Gender
+                  </th>
+                  <th class="text-left">
+                    Hobbies
+                  </th>
+                  <th class="text-left">
+                    Location
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="detail in details"
+                  :key="detail.name"
+                >
+                  <td>{{ detail.count }}</td>
+                  <td>{{ detail.name }}</td>
+                  <td>{{ detail.email }}</td>
+                  <td>{{ detail.gender }}</td>
+                  <td>{{ detail.interests }}</td>
+                  <td>{{ detail.location }}</td>
+                  <td>
+                    <v-btn
+                    depressed>
+                        <v-icon>{{ icons.mdiPencil }}</v-icon>
+                    </v-btn>
+                  </td>
+                  <td>
+                    <v-btn
+                    depressed>
+                      <v-icon>{{ icons.mdiDelete }}</v-icon>
+                    </v-btn>
+                    </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+
+        </v-row>
       </v-col>
+      <!-- <v-col></v-col> -->
     </v-row>
   </div>
 </template>
 
 <script>
+import {
+  mdiPencil,
+  mdiDelete,
+} from '@mdi/js'
+
 export default {
+  
   data(){
     return {
+      icons: {
+        mdiPencil,
+        mdiDelete,
+      },
       name: '',
       email: '',
       passwordLength: '',
       password: '',
-      buttonView: false,
+      alertMessage: false,
+      valid: true,
       location: '',
-      gender: [],
+      count: 0,
+      gender: '',
       interests: [],
+      snackbar: false,
       rules: {
         name: [val => (val || '').length > 0 || 'This field is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'This field must be in alphabets only'],
         email: [val => (val || '').length > 0 || 'This field is required', val => (!val) || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
         passwordLength: [val => (val|| '').length > 0 || 'This field is required', val => (!val) || /^[0-9]*$/.test(val) || 'This field must be in numbers only', val => (7 < (val)) && ((val) < 21) || 'Password length must be between 8 and 20'],
-        location: [val => (val || '').length > 0 || 'This field is required']
+        location: [val => (val || '').length > 0 || 'This field is required'], 
       },
       locations: ['Chennai','Bangalore','Hyderabad','Pune','Mumbai','Delhi','Kolkata'],
-      detail: [],
+      details: [],
       userDetails: [],
+      headers: [
+        { text: "S.No", value: "name", width: "20%" },
+        { text: "Calories", value: "calories", width: "50%" },
+        { text: "Fat (g)", value: "fat" },
+        { text: "Carbs (g)", value: "carbs", width: "200px" },
+      ],
     }
   },
   computed:{
@@ -202,28 +300,36 @@ export default {
   
   methods:{
     view(){
-      this.userDetails = localStorage.getItem('userDetails')
       console.log(this.userDetails)
     },
-    submit(){
-      this.detail.push({
-        name: this.name,
-        email: this.email,
-        gender: this.gender,
-        interests: this.interests,
-        location: this.location
-      })
-      localStorage.setItem('userDetails',JSON.stringify(this.detail))
-      alert('Form Submitted!')
-      this.name = ''
-      this.email = ''
-      this.passwordLength = ''
-      this.location = ''
-      this.gender = []
-      this.interests = []
+    submit(){    
+      // this.alertMessage = false 
+      if(!this.$refs.form.validate()){
+        console.log('error');
+        this.snackbar = true
+      }
+      else{
+        this.snackbar = false
+        this.count+=1
+        this.details.push({
+          count: this.count,
+          name: this.name,
+          email: this.email,
+          gender: this.gender,
+          interests: this.interests,
+          location: this.location
+        })
+        // alert('Form Submitted!')
+        this.name = ''
+        this.email = ''
+        this.passwordLength = ''
+        this.location = ''
+        this.gender = []
+        this.interests = []
+      }
     },
     clear(){
-      window.location.reload()
+      this.$refs.form.reset()
     },
     generatePassword(){
       // console.log("password");
@@ -266,8 +372,11 @@ export default {
 <style scoped>
 
 .card{
-  margin-top: 2%;
-  margin-left: 2%; 
+  margin-top: 4%;
+  margin-left: 4%; 
+}
+.table{
+  margin-top: 5%;
 }
 </style>
 
