@@ -134,14 +134,21 @@
                 elevation="4"
                 color="primary"
                 :disabled="isSubmitDisabled"
+                v-if="submitButton"
                 @click="submit"
               >Submit</v-btn>
-              
+              <v-btn
+                color="primary"
+                v-if="updateButton"
+                @click="updateUser">
+                Update
+              </v-btn>
             </v-col>
             <v-col>
               <v-btn
                 elevation="4"
                 color="primary"
+                outlined
                 :disabled="isResetDisabled"
                 @click="$refs.form.reset()"
               >Reset</v-btn>
@@ -187,7 +194,7 @@
                   <td>{{ entry.name }}</td>
                   <td>{{ entry.email }}</td>
                   <td>{{ entry.gender }}</td>
-                  <td>{{ entry.interests }}</td>
+                  <td>{{ entry.interests.join(', ') }}</td>
                   <td>{{ entry.location }}</td>
                   <td>
                     <v-btn
@@ -235,8 +242,11 @@ export default {
       password: '',
       alertMessage: false,
       valid: true,
+      updateButton:false,
+      submitButton:true,
       location: '',
       gender: '',
+      rowId: 0,
       interests: [],
       snackbar: false,
       rules: {
@@ -304,12 +314,26 @@ export default {
     },
     editUser(id){
       // console.log(this.details[id].name);
+      this.rowId = id
       this.name = this.details[id].name;
       // console.log(this.name,"name")
       this.email = this.details[id].email
       this.location = this.details[id].location
       this.gender = this.details[id].gender
       this.interests = this.details[id].interests
+      this.updateButton = true
+      this.submitButton = false
+    },
+    updateUser(){
+      this.details[this.rowId].name = this.name
+      // console.log(this.name,"name")
+      this.details[this.rowId].email = this.email
+      this.details[this.rowId].location = this.location
+      this.details[this.rowId].gender = this.gender
+      this.details[this.rowId].interests = this.interests
+      this.$refs.form.reset()
+      this.updateButton = false
+      this.submitButton = true
     },
     generatePassword(){
       // console.log("password");
