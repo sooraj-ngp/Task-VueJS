@@ -94,7 +94,7 @@
             cols="4"
               md="3">
               <v-checkbox
-                v-model="interests"
+                v-model="hobbies"
                 label="Music"
                 value="Music"
               ></v-checkbox>
@@ -103,7 +103,7 @@
             cols="4"
               md="3">
               <v-checkbox
-                v-model="interests"
+                v-model="hobbies"
                 label="Movies"
                 value="Movies"
               ></v-checkbox>
@@ -112,7 +112,7 @@
             cols="4"
               md="3">
               <v-checkbox
-                v-model="interests"
+                v-model="hobbies"
                 label="Series"
                 value="Series"
               ></v-checkbox>
@@ -121,7 +121,7 @@
             cols="4"
               md="3">
               <v-checkbox
-                v-model="interests"
+                v-model="hobbies"
                 label="Gaming"
                 value="Gaming"
               ></v-checkbox>
@@ -160,6 +160,7 @@
         </v-card>
       </v-col>
       <v-col cols="auto">
+        <div v-if="details.length>0">
         <v-row>
           <v-simple-table class="table">
             <template v-slot:default>
@@ -194,7 +195,7 @@
                   <td>{{ entry.name }}</td>
                   <td>{{ entry.email }}</td>
                   <td>{{ entry.gender }}</td>
-                  <td>{{ entry.interests.join(', ') }}</td>
+                  <td>{{ entry.hobbies.join(', ') }}</td>
                   <td>{{ entry.location }}</td>
                   <td>
                     <v-btn
@@ -239,14 +240,13 @@
           </v-simple-table>
         </v-row>
         <v-row>
-          <h2>Total Count: {{ details.length }}</h2>
+          <v-col></v-col>
+            <h2>Total Count: {{ details.length }}</h2>
+          <v-col></v-col>
         </v-row>
+        </div>
       </v-col>
-      <!-- <v-col></v-col> -->
     </v-row>
-    <v-row justify="center">
-    
-  </v-row>
   </div>
 </template>
 
@@ -276,7 +276,7 @@ export default {
       location: '',
       gender: '',
       rowId: 0,
-      interests: [],
+      hobbies: [],
       snackbar: false,
       rules: {
         name: [val => (val || '').length > 0 || 'Name is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'This field must be in alphabets only'],
@@ -291,12 +291,12 @@ export default {
   },
   computed:{
     isSubmitDisabled() {
-      if(!this.name || !this.email || !this.passwordLength || !this.gender || !this.location || this.interests.length === 0){
+      if(!this.name || !this.email || !this.passwordLength || !this.gender || !this.location || this.hobbies.length === 0){
         return true
       } else return false
     },
     isResetDisabled() {
-      if(!this.name && !this.email && !this.passwordLength && !this.gender && !this.location && this.interests.length === 0){
+      if(!this.name && !this.email && !this.passwordLength && !this.gender && !this.location && this.hobbies.length === 0){
         return true
       } else return false
     }
@@ -319,7 +319,7 @@ export default {
       console.log(this.userDetails)
     },
     submit(){ 
-      // console.log(this.interests.length);   
+      // console.log(this.hobbies.length);   
       // this.alertMessage = false 
       if(!this.$refs.form.validate()){
         console.log('error');
@@ -331,7 +331,7 @@ export default {
           name: this.name,
           email: this.email.toLowerCase(),
           gender: this.gender,
-          interests: this.interests,
+          hobbies: this.hobbies,
           location: this.location
         })
         this.$refs.form.reset()
@@ -355,7 +355,7 @@ export default {
       this.email = this.details[id].email
       this.location = this.details[id].location
       this.gender = this.details[id].gender
-      this.interests = this.details[id].interests
+      this.hobbies = this.details[id].hobbies
       this.updateButton = true
       this.submitButton = false
     },
@@ -365,7 +365,7 @@ export default {
       this.details[this.rowId].email = this.email
       this.details[this.rowId].location = this.location
       this.details[this.rowId].gender = this.gender
-      this.details[this.rowId].interests = this.interests
+      this.details[this.rowId].hobbies = this.hobbies
       this.$refs.form.reset()
       this.updateButton = false
       this.submitButton = true
