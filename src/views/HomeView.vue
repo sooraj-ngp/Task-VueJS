@@ -206,19 +206,47 @@
                   <td>
                     <v-btn
                     depressed
-                    @click="deleteUser(index)">
-                      <v-icon>{{ icons.mdiDelete }}</v-icon>
+                    @click="deleteClick">
+                    <v-icon>{{ icons.mdiDelete }}</v-icon>
                     </v-btn>
-                    </td>
+                  </td>
+                  <v-dialog
+                    v-model="dialog"
+                    persistent
+                    max-width="290"
+                  >
+                    <v-card>
+                      <v-card-title class="text-h5">
+                        Do you want to Delete this record?
+                      </v-card-title>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          color=""
+                          text
+                          @click="dialog = false"
+                        >Cancel</v-btn>
+                        <v-btn
+                          color="error"
+                          @click="deleteUser(index)"
+                        >Delete</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
                 </tr>
               </tbody>
             </template>
           </v-simple-table>
-
+        </v-row>
+        <v-row>
+          <h2>Total Count: {{ details.length }}</h2>
         </v-row>
       </v-col>
       <!-- <v-col></v-col> -->
     </v-row>
+    <v-row justify="center">
+    
+  </v-row>
   </div>
 </template>
 
@@ -244,6 +272,7 @@ export default {
       valid: true,
       updateButton:false,
       submitButton:true,
+      dialog: false,
       location: '',
       gender: '',
       rowId: 0,
@@ -252,13 +281,12 @@ export default {
       rules: {
         name: [val => (val || '').length > 0 || 'Name is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'This field must be in alphabets only'],
         email: [val => (val || '').length > 0 || 'Email is required', val => (!val) || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
-        passwordLength: [val => (val|| '').length > 0 || 'Password is required', val => (!val) || /^[0-9]+$/.test(val) || 'This field must be in numbers only', val => (7 < (val)) && ((val) < 21) || 'Password length must be between 8 and 20'],
+        passwordLength: [val => (val|| '').length > 0 || 'Password length is required', val => (!val) || /^[0-9]+$/.test(val) || 'This field must be in numbers only', val => (7 < (val)) && ((val) < 21) || 'Password length must be between 8 and 20'],
         location: [val => (val || '').length > 0 || 'Location is required'], 
       },
       locations: ['Chennai','Bangalore','Hyderabad','Pune','Mumbai','Delhi','Kolkata'],
       details: [],
       userDetails: [],
-      
     }
   },
   computed:{
@@ -301,7 +329,7 @@ export default {
         this.snackbar = false
         this.details.push({
           name: this.name,
-          email: this.email,
+          email: this.email.toLowerCase(),
           gender: this.gender,
           interests: this.interests,
           location: this.location
@@ -309,8 +337,15 @@ export default {
         this.$refs.form.reset()
       }
     },
+    deleteClick(){
+      this.dialog = true
+    },
     deleteUser(id){
       this.details.splice(id,1)
+      this.$refs.form.reset()
+      this.updateButton = false
+      this.submitButton = true
+      this.dialog = false
     },
     editUser(id){
       // console.log(this.details[id].name);
@@ -374,7 +409,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+h2{
+  color:white
+}
 .card{
   margin-top: 4%;
   margin-left: 4%; 
