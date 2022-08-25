@@ -6,7 +6,7 @@
       cols="4">
         <v-card
           class="pa-2 card"
-          max-width="450"
+          max-width="350"
           elevation="8"
           outlined
           tile
@@ -28,8 +28,9 @@
             ref="form"
             v-model="valid"
             lazy-validation>
+            <h1>Employee </h1>
           <v-text-field
-            v-model="name"
+            v-model="employee.name"
             :rules="rules.name"
             color="blue darken-2"
             label="Name"
@@ -37,7 +38,7 @@
             required
           ></v-text-field>
           <v-text-field
-            v-model="email"
+            v-model="employee.email"
             v-on:keyup.enter="generatePassword"
             :rules="rules.email"
             color="blue darken-2"
@@ -46,87 +47,24 @@
             required
           ></v-text-field>
           <v-text-field
-            v-model="passwordLength"
+            v-model="employee.phoneNumber"
             color="blue darken-2"
-            label="Password Length"
-            :rules="rules.passwordLength"
+            label="Phone Number"
+            maxlength="10"
+            :rules="rules.phoneNumber"
             outlined
             required
           ></v-text-field>
-          <v-text-field
-            v-model="password"
-            color="blue darken-2"
-            label="Password"
-            readonly
-            outlined
-          ></v-text-field>
 
           <v-combobox
-            v-model="location"
-            :rules="rules.location"
-            :items="locations"
-            label="Location"
+            v-model="employee.departmentId"
+            :rules="rules.department"
+            :items="departmentIds"
+            label="Department Id"
             clearable
             outlined
           ></v-combobox>
-          Gender:
-          <v-radio-group v-model="gender" required>
-            <v-row>
-              <v-col></v-col>
-              <v-col>
-                <v-radio
-                  label="Male"
-                  value="Male"
-                ></v-radio>
-              </v-col>
-              <v-col>
-                <v-radio
-                  label="Female"
-                  value="Female"
-                ></v-radio>
-              </v-col>
-              <v-col></v-col>
-            </v-row>
-          </v-radio-group>
-          Hobbies:
-          <v-row>
-            <v-col 
-            cols="4"
-              md="3">
-              <v-checkbox
-                v-model="hobbies"
-                label="Music"
-                value="Music"
-              ></v-checkbox>
-            </v-col>
-            <v-col
-            cols="4"
-              md="3">
-              <v-checkbox
-                v-model="hobbies"
-                label="Movies"
-                value="Movies"
-              ></v-checkbox>
-            </v-col>
-            <v-col 
-            cols="4"
-              md="3">
-              <v-checkbox
-                v-model="hobbies"
-                label="Series"
-                value="Series"
-              ></v-checkbox>
-            </v-col>
-            <v-col
-            cols="4"
-              md="3">
-              <v-checkbox
-                v-model="hobbies"
-                label="Gaming"
-                value="Gaming"
-              ></v-checkbox>
-            </v-col>
-          </v-row>
+          
           <v-row>
             <v-col></v-col>
             <v-col>
@@ -160,14 +98,15 @@
         </v-card>
       </v-col>
       <v-col cols="auto">
-        <div v-if="details.length>0">
+        <div v-if="employeeDetails.length>0">
         <v-row>
-          <v-simple-table class="table">
+          <v-simple-table 
+            class="table">
             <template v-slot:default>
               <thead>
                 <tr>
                   <th class="text-left">
-                    S.No
+                    Employee Id
                   </th>
                   <th class="text-left">
                     Name
@@ -176,27 +115,23 @@
                     Email
                   </th>
                   <th class="text-left">
-                    Gender
+                    Phone Number
                   </th>
                   <th class="text-left">
-                    Hobbies
-                  </th>
-                  <th class="text-left">
-                    Location
+                    Department Id
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr
-                  v-for="(entry, index) in details"
-                  :key="index"
+                  v-for="(entry, index) in employeeDetails"
+                  :key="entry.employee_id"
                 >
-                  <td>{{ index+1 }}</td>
-                  <td>{{ entry.name }}</td>
-                  <td>{{ entry.email }}</td>
-                  <td>{{ entry.gender }}</td>
-                  <td>{{ entry.hobbies.join(', ') }}</td>
-                  <td>{{ entry.location }}</td>
+                  <td>{{ entry.employee_id }}</td>
+                  <td>{{ entry.employee_name }}</td>
+                  <td>{{ entry.employee_mail }}</td>
+                  <td>{{ entry.employee_number }}</td>
+                  <td>{{ entry.department_id }}</td>
                   <td>
                     <v-btn
                     depressed
@@ -229,7 +164,7 @@
                         >Cancel</v-btn>
                         <v-btn
                           color="error"
-                          @click="deleteUser(index)"
+                          @click="deleteUser(entry.employee_id)"
                         >Delete</v-btn>
                       </v-card-actions>
                     </v-card>
@@ -241,7 +176,7 @@
         </v-row>
         <v-row>
           <v-col></v-col>
-            <h2>Total Count: {{ details.length }}</h2>
+            <h2>Total Count: {{ employeeDetails.length }}</h2>
           <v-col></v-col>
         </v-row>
         </div>
@@ -256,13 +191,20 @@ import {
   mdiDelete,
 } from '@mdi/js'
 
+import axios from 'axios';
+
 export default {
-  
   data(){
     return {
       icons: {
         mdiPencil,
         mdiDelete,
+      },
+      employee:{
+        name: '',
+        email: '',
+        phoneNumber: '',
+        departmentId: ''
       },
       name: '',
       email: '',
@@ -275,28 +217,58 @@ export default {
       dialog: false,
       location: '',
       gender: '',
+      instance: null,
+      employeeDetails: [],
+      departmentDetails: [],
       rowId: 0,
       hobbies: [],
       snackbar: false,
       rules: {
-        name: [val => (val || '').length > 0 || 'Name is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'This field must be in alphabets only'],
-        email: [val => (val || '').length > 0 || 'Email is required', val => (!val) || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
-        passwordLength: [val => (val|| '').length > 0 || 'Password length is required', val => (!val) || /^[0-9]+$/.test(val) || 'This field must be in numbers only', val => (7 < (val)) && ((val) < 21) || 'Password length must be between 8 and 20'],
-        location: [val => (val || '').length > 0 || 'Location is required'], 
+        name: [val => (val != '' && val != null)|| 'Name is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'Name must be in alphabets only'],
+        email: [val => (val != '' && val != null)|| 'Email is required', val => (!val) || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
+        phoneNumber: [val => (val != '' && val != null) || 'Phone Number is required', val => (!val) || /^[0-9]+$/.test(val) || 'Phone Number must be in numbers only'],
+        department: [val => (val != '' && val != null) || 'Department is required'], 
       },
-      locations: ['Chennai','Bangalore','Hyderabad','Pune','Mumbai','Delhi','Kolkata'],
+      departments: [],
+      departmentIds: [],
+      departmentNames: [],
       details: [],
       userDetails: [],
+
     }
+  },
+  mounted() {
+    this.instance = axios.create({
+      baseURL: 'http://127.0.0.1:3333',
+      headers:{
+        'Content-type': 'application/json'
+      }
+    })
+    this.instance.get('/employee/selectAll')
+    .then((response) => {
+      this.employeeDetails = response.data
+      // console.log(this.employeeDetails);
+    })
+    this.instance.get('/department/selectAll')
+    .then((response) => {
+      // console.log(response.data)
+      this.departmentDetails = response.data.sort()
+      for(let i=0; i<this.departmentDetails.length; i++){
+        this.departmentIds.push(this.departmentDetails[i].department_id)
+        this.departmentNames.push(this.departmentDetails[i].department_name)
+      }
+      this.departmentIds.sort()
+      // console.log(this.departmentNames);
+    })
   },
   computed:{
     isSubmitDisabled() {
-      if(!this.name || !this.email || !this.passwordLength || !this.gender || !this.location || this.hobbies.length === 0){
+      if(!this.employee.name || !this.employee.email || !this.employee.phoneNumber || !this.employee.departmentId){
         return true
       } else return false
     },
     isResetDisabled() {
-      if(!this.name && !this.email && !this.passwordLength && !this.gender && !this.location && this.hobbies.length === 0){
+      if(!this.employee.name && !this.employee.email && !this.employee.phoneNumber && !this.employee.departmentId){
         return true
       } else return false
     }
@@ -327,12 +299,11 @@ export default {
       }
       else{
         this.snackbar = false
-        this.details.push({
-          name: this.name,
-          email: this.email.toLowerCase(),
-          gender: this.gender,
-          hobbies: this.hobbies,
-          location: this.location
+        this.instance.post('/employee/insert',{
+          employeeName: this.employee.name,
+          employeeMail: this.employee.email.toLowerCase(),
+          employeeNumber: this.employee.phoneNumber,
+          departmentId: this.employee.departmentId
         })
         this.$refs.form.reset()
       }
@@ -341,31 +312,33 @@ export default {
       this.dialog = true
     },
     deleteUser(id){
-      this.details.splice(id,1)
+      this.instance.delete('/employee/delete/'+id)
       this.$refs.form.reset()
       this.updateButton = false
       this.submitButton = true
       this.dialog = false
     },
     editUser(id){
-      // console.log(this.details[id].name);
+      console.log(this.employeeDetails[id]);
       this.rowId = id
-      this.name = this.details[id].name;
-      // console.log(this.name,"name")
-      this.email = this.details[id].email
-      this.location = this.details[id].location
-      this.gender = this.details[id].gender
-      this.hobbies = this.details[id].hobbies
+      this.employee.name = this.employeeDetails[id].employee_name
+      this.employee.email = this.employeeDetails[id].employee_mail
+      this.employee.phoneNumber = this.employeeDetails[id].employee_number
+      this.employee.departmentId = this.employeeDetails[id].department_id
       this.updateButton = true
       this.submitButton = false
     },
     updateUser(){
-      this.details[this.rowId].name = this.name
-      // console.log(this.name,"name")
-      this.details[this.rowId].email = this.email
-      this.details[this.rowId].location = this.location
-      this.details[this.rowId].gender = this.gender
-      this.details[this.rowId].hobbies = this.hobbies
+      this.instance.patch('/employee/update',{
+        employeeName:this.employee.name,
+        employeeMail:this.employee.email.toLowerCase(),
+        employeeNumber:this.employee.phoneNumber,
+        departmentId:this.employee.departmentId
+      })
+      // this.employeeDetails[this.rowId].employee_name = this.employee.name
+      // this.employeeDetails[this.rowId].employee_mail = this.employee.email 
+      // this.employeeDetails[this.rowId].employee_number = this.employee.phoneNumber 
+      // this.employeeDetails[this.rowId].department_id = this.employee.departmentId 
       this.$refs.form.reset()
       this.updateButton = false
       this.submitButton = true
@@ -411,6 +384,9 @@ export default {
 <style scoped>
 h2{
   color:white
+}
+h1{
+  text-align: center;
 }
 .card{
   margin-top: 4%;
