@@ -39,7 +39,6 @@
           ></v-text-field>
           <v-text-field
             v-model="employee.email"
-            v-on:keyup.enter="generatePassword"
             :rules="rules.email"
             color="blue darken-2"
             label="Email"
@@ -137,25 +136,22 @@
                   v-for="(entry, index) in employeeDetails"
                   :key="entry.employee_id"
                 >
-                  <td>{{ entry.employee_id }}</td>
-                  <td>{{ entry.employee_name }}</td>
-                  <td>{{ entry.employee_mail }}</td>
-                  <td>{{ entry.employee_number }}</td>
-                  <td>{{ entry.department_id }}</td>
-                  <td>
-                    <v-btn
-                    depressed
-                    @click="editEmployee(index)">
-                        <v-icon>{{ icons.mdiPencil }}</v-icon>
-                    </v-btn>
+                  <td class="text-center">{{ entry.employee_id }}</td>
+                  <td class="text-center">{{ entry.employee_name }}</td>
+                  <td class="text-center">{{ entry.employee_mail }}</td>
+                  <td class="text-center">{{ entry.employee_number }}</td>
+                  <td class="text-center">{{ entry.department_id }}</td>
+                  <td class="text-center">
+                  <v-icon 
+                    color="black"
+                    @click="editEmployee(index)">{{ icons.mdiPencil }}</v-icon>
                   </td>
-                  <td>
-                    <v-btn
-                    depressed
-                    @click="dialog = true">
-                    <v-icon>{{ icons.mdiDelete }}</v-icon>
-                    </v-btn>
+                  <td class="text-center">
+                    <v-icon
+                      color="black" 
+                      @click="dialog = true">{{ icons.mdiDelete }}</v-icon>
                   </td>
+                  
                   <v-dialog
                     v-model="dialog"
                     persistent
@@ -409,7 +405,7 @@ h1{
 }
 .card{
   margin-top: 4%;
-  margin-left: 4%; 
+  margin-left: 5%; 
 }
 .table{
   margin-top: 5%;
