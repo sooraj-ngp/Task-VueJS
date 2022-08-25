@@ -78,7 +78,7 @@
               <v-btn
                 color="primary"
                 v-if="updateButton"
-                @click="updateUser">
+                @click="updateEmployee()">
                 Update
               </v-btn>
             </v-col>
@@ -88,10 +88,16 @@
                 color="primary"
                 outlined
                 :disabled="isResetDisabled"
-                @click="$refs.form.reset()"
+                @click="reset"
               >Reset</v-btn>
             </v-col>
-            <v-col></v-col>
+            <v-col>
+              <!-- <v-btn
+                elevation="4"
+                color="primary"
+                @click="view"
+              >view</v-btn> -->
+            </v-col>
           </v-row>
           <v-row></v-row>
           </v-form>
@@ -105,21 +111,25 @@
             <template v-slot:default>
               <thead>
                 <tr>
-                  <th class="text-left">
+                  <th class="text-center">
                     Employee Id
                   </th>
-                  <th class="text-left">
+                  <th class="text-center">
                     Name
                   </th>
-                  <th class="text-left">
+                  <th class="text-center">
                     Email
                   </th>
-                  <th class="text-left">
+                  <th class="text-center">
                     Phone Number
                   </th>
-                  <th class="text-left">
+                  <th class="text-center">
                     Department Id
                   </th>
+                  <th colspan="2" class="text-center">
+                    Action
+                  </th>
+                  
                 </tr>
               </thead>
               <tbody>
@@ -135,36 +145,34 @@
                   <td>
                     <v-btn
                     depressed
-                    @click="editUser(index)">
+                    @click="editEmployee(index)">
                         <v-icon>{{ icons.mdiPencil }}</v-icon>
                     </v-btn>
                   </td>
                   <td>
                     <v-btn
                     depressed
-                    @click="deleteClick">
+                    @click="dialog = true">
                     <v-icon>{{ icons.mdiDelete }}</v-icon>
                     </v-btn>
                   </td>
                   <v-dialog
                     v-model="dialog"
                     persistent
-                    max-width="290"
+                    max-width="350"
                   >
                     <v-card>
                       <v-card-title class="text-h5">
-                        Do you want to Delete this record?
+                        Do you want to <b>delete</b> this record? 
                       </v-card-title>
                       <v-card-actions>
-                        <v-spacer></v-spacer>
                         <v-btn
-                          color=""
                           text
-                          @click="dialog = false"
+                          @click="closeDialog()"
                         >Cancel</v-btn>
                         <v-btn
                           color="error"
-                          @click="deleteUser(entry.employee_id)"
+                          @click="deleteEmployee(index, entry.employee_id)"
                         >Delete</v-btn>
                       </v-card-actions>
                     </v-card>
@@ -201,6 +209,7 @@ export default {
         mdiDelete,
       },
       employee:{
+        id: '',
         name: '',
         email: '',
         phoneNumber: '',
@@ -246,7 +255,7 @@ export default {
     })
     this.instance.get('/employee/selectAll')
     .then((response) => {
-      this.employeeDetails = response.data
+      this.employeeDetails = response.data.reverse()
       // console.log(this.employeeDetails);
     })
     this.instance.get('/department/selectAll')
@@ -271,8 +280,7 @@ export default {
       if(!this.employee.name && !this.employee.email && !this.employee.phoneNumber && !this.employee.departmentId){
         return true
       } else return false
-    }
-
+    },
   },
   watch:{
     passwordLength(value){
@@ -287,11 +295,14 @@ export default {
   },
   
   methods:{
-    view(){
-      console.log(this.userDetails)
+    view(){ 
+      this.instance.get('/employee/selectAll')
+      .then((response) => {
+        this.employeeDetails = response.data.reverse()
+        // console.log(this.employeeDetails);
+      })
     },
     submit(){ 
-      // console.log(this.hobbies.length);   
       // this.alertMessage = false 
       if(!this.$refs.form.validate()){
         console.log('error');
@@ -304,23 +315,35 @@ export default {
           employeeMail: this.employee.email.toLowerCase(),
           employeeNumber: this.employee.phoneNumber,
           departmentId: this.employee.departmentId
+        }).then((response) => {
+          console.log(response.data)
+          this.view()
+          this.$refs.form.reset()
         })
-        this.$refs.form.reset()
       }
     },
-    deleteClick(){
-      this.dialog = true
-    },
-    deleteUser(id){
-      this.instance.delete('/employee/delete/'+id)
+    reset(){
       this.$refs.form.reset()
+      this.updateButton = false
+      this.submitButton = true
+    },
+    deleteEmployee(index, id){
+      // console.log(index, id);
+      this.instance.delete('/employee/delete/'+id)
+      .then((response) => {
+        console.log(response.data)
+        this.view()
+      })
+      // this.employeeDetails.splice(index, 1)
       this.updateButton = false
       this.submitButton = true
       this.dialog = false
     },
-    editUser(id){
-      console.log(this.employeeDetails[id]);
+    editEmployee(id){
+      // console.log(this.employeeDetails[id]);
+      console.log(this.employeeDetails[id].employee_id);
       this.rowId = id
+      this.employee.id = this.employeeDetails[id].employee_id
       this.employee.name = this.employeeDetails[id].employee_name
       this.employee.email = this.employeeDetails[id].employee_mail
       this.employee.phoneNumber = this.employeeDetails[id].employee_number
@@ -328,12 +351,28 @@ export default {
       this.updateButton = true
       this.submitButton = false
     },
-    updateUser(){
-      this.instance.patch('/employee/update',{
-        employeeName:this.employee.name,
-        employeeMail:this.employee.email.toLowerCase(),
-        employeeNumber:this.employee.phoneNumber,
-        departmentId:this.employee.departmentId
+    updateEmployee(){
+      // console.log(this.employee.id);
+      let updateDetails = {}
+      updateDetails.employeeId = this.employee.id
+      if(this.employeeDetails[this.rowId].employee_name != this.employee.name){
+        updateDetails.employeeName = this.employee.name
+      }
+      if(this.employeeDetails[this.rowId].employee_mail != this.employee.email){
+        updateDetails.employeeMail = this.employee.email
+      }
+      if(this.employeeDetails[this.rowId].employee_number != this.employee.phoneNumber){
+        updateDetails.employeeNumber = this.employee.phoneNumber
+      }
+      if(this.employeeDetails[this.rowId].department_id != this.employee.departmentId){
+        updateDetails.departmentId = this.employee.departmentId
+      }
+      // console.log(updateDetails);
+      this.instance.patch('/employee/update',updateDetails)
+      .then((response) => {
+        console.log(response.data)
+        this.view()
+        this.$refs.form.reset()
       })
       // this.employeeDetails[this.rowId].employee_name = this.employee.name
       // this.employeeDetails[this.rowId].employee_mail = this.employee.email 
@@ -343,28 +382,8 @@ export default {
       this.updateButton = false
       this.submitButton = true
     },
-    generatePassword(){
-      // console.log("password");
-      const Allowed = {
-        Uppers: "QWERTYUIOPASDFGHJKLZXCVBNM",
-        Lowers: "qwertyuiopasdfghjklzxcvbnm",
-        Numbers: "1234567890",
-        Symbols: "!@#$%^&*"
-      }
-
-      const getRandomCharFromString = (str) => str.charAt(Math.floor(Math.random() * str.length))
-
-      const generate = (length = this.passwordLength) => { 
-        let pwd = "";
-        pwd += getRandomCharFromString(Allowed.Uppers); 
-        pwd += getRandomCharFromString(Allowed.Lowers); 
-        pwd += getRandomCharFromString(Allowed.Numbers); 
-        pwd += getRandomCharFromString(Allowed.Symbols);
-        for (let i = pwd.length; i < length; i++)
-          pwd += getRandomCharFromString(Object.values(Allowed).join('')); 
-        return pwd
-      }
-      this.password = generate(this.passwordLength)
+    closeDialog(){
+      this.dialog = false;
     }
   }
 
