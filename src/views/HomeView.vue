@@ -4,7 +4,7 @@
     <v-row>
       <v-col>
         <h2>Hello {{user}}!</h2>
-      <v-row>
+        <v-row>
         <v-col
         cols="4">
           <v-card
@@ -113,22 +113,22 @@
                 <thead>
                   <tr>
                     <th class="text-center">
-                      Employee Id
+                      <b>Employee Id</b>
                     </th>
                     <th class="text-center">
-                      Name
+                      <b>Name</b>
                     </th>
                     <th class="text-center">
-                      Email
+                      <b>Email</b>
                     </th>
                     <th class="text-center">
-                      Phone Number
+                      <b>Phone Number</b>
                     </th>
                     <th class="text-center">
-                      Department Id
+                      <b>Department Id</b>
                     </th>
                     <th colspan="2" class="text-center">
-                      Action
+                      <b>Action</b>
                     </th>
                     
                   </tr>
@@ -191,10 +191,9 @@
       </v-col>
       <v-col cols="1">
         <div class="button">
-        <router-link to="/login" class="button">
+        <router-link to="/login">
           <v-btn 
           color="primary"
-          to="/login"
           @click="logout">Logout</v-btn></router-link>
         </div>
       </v-col>
@@ -369,8 +368,8 @@ export default {
       if(this.employeeDetails[this.rowId].employee_number != this.employee.phoneNumber){
         updateDetails.employeeNumber = this.employee.phoneNumber
       }
-      if(this.employeeDetails[this.rowId].department_id != this.employee.departmentId){
-        updateDetails.departmentId = this.employee.departmentId
+      if(this.employeeDetails[this.rowId].department_id != this.departments[this.employee.departmentName]){
+        updateDetails.departmentId = this.departments[this.employee.departmentName]
       }
       // console.log(updateDetails);
       this.instance.patch('/employee/update',updateDetails)
@@ -387,8 +386,7 @@ export default {
       this.dialog = false;
     },
     logout(){
-      
-      localStorage.clear()
+      localStorage.clear();
       this.$router.push({ path: "/login" })
     }
   }

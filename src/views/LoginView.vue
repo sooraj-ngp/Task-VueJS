@@ -94,9 +94,6 @@ export default {
       valid: true
     }
   },
-  mounted() {
-      console.log(localStorage.getItem('user',), 'user');
-  },
   methods:{
     login(){ 
       if(!this.$refs.form.validate()){
@@ -104,17 +101,15 @@ export default {
         this.snackbar = true
       }
       else{
-        if(this.email == 'sooraj@gmail.com' || this.password == 'sooraj123'){
+        if(this.email == 'sooraj@gmail.com' || this.password == 'Sooraj!123'){
             this.$router.push({ path: "/" })
             localStorage.setItem('user', this.email)
         }
       }
     },
-    reset(){
-      this.$refs.form.reset()
-      this.updateButton = false
-      this.submitButton = true
-    }
+    view(){
+      console.log(localStorage.getItem('user',), 'user');
+      }
     }
 }
 
