@@ -2,186 +2,200 @@
   <!-- <hello-world /> -->
   <div>
     <v-row>
-      <v-col
-      cols="4">
-        <v-card
-          class="pa-2 card"
-          max-width="350"
-          elevation="8"
-          outlined
-          tile
-        >
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="3000">
-            Enter a valid input
-            <template v-slot:action="{ attrs }">
-              <v-btn
-                color="blue"
-                text
-                v-bind="attrs"
-                @click="snackbar = false"
-              >close</v-btn>
-            </template>
-          </v-snackbar>
-          <v-form
-            ref="form"
-            v-model="valid"
-            lazy-validation>
-            <h1>Employee </h1>
-          <v-text-field
-            v-model="employee.name"
-            :rules="rules.name"
-            color="blue darken-2"
-            label="Name"
+      <v-col>
+        <h2>Hello {{user}}!</h2>
+      <v-row>
+        <v-col
+        cols="4">
+          <v-card
+            class="pa-2 card"
+            max-width="350"
+            elevation="8"
             outlined
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="employee.email"
-            :rules="rules.email"
-            color="blue darken-2"
-            label="Email"
-            outlined
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="employee.phoneNumber"
-            color="blue darken-2"
-            label="Phone Number"
-            maxlength="10"
-            :rules="rules.phoneNumber"
-            outlined
-            required
-          ></v-text-field>
+            tile
+          >
+          <v-snackbar
+              v-model="snackbar"
+              :timeout="3000">
+              Enter a valid input
+              <template v-slot:action="{ attrs }">
+                <v-btn
+                  color="blue"
+                  text
+                  v-bind="attrs"
+                  @click="snackbar = false"
+                >close</v-btn>
+              </template>
+            </v-snackbar>
+            <v-form
+              ref="form"
+              v-model="valid"
+              lazy-validation>
+              <h1>Employee </h1>
+            <v-text-field
+              v-model="employee.name"
+              :rules="rules.name"
+              color="blue darken-2"
+              label="Name"
+              outlined
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="employee.email"
+              :rules="rules.email"
+              color="blue darken-2"
+              label="Email"
+              outlined
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="employee.phoneNumber"
+              color="blue darken-2"
+              label="Phone Number"
+              maxlength="10"
+              :rules="rules.phoneNumber"
+              outlined
+              required
+            ></v-text-field>
 
-          <v-combobox
-            v-model="employee.departmentName"
-            :items="departmentNames"
-            label="Department Name"
-            clearable
-            outlined
-          ></v-combobox>
-          
+            <v-combobox
+              v-model="employee.departmentName"
+              :items="departmentNames"
+              label="Department Name"
+              clearable
+              outlined
+            ></v-combobox>
+            
+            <v-row>
+              <v-col></v-col>
+              <v-col>
+                <v-btn
+                  elevation="4"
+                  color="primary"
+                  :disabled="isSubmitDisabled"
+                  v-if="submitButton"
+                  @click="submit"
+                >Submit</v-btn>
+                <v-btn
+                  color="primary"
+                  v-if="updateButton"
+                  @click="updateEmployee">
+                  Update
+                </v-btn>
+              </v-col>
+              <v-col>
+                <v-btn
+                  elevation="4"
+                  color="primary"
+                  outlined
+                  :disabled="isResetDisabled"
+                  @click="reset"
+                >Reset</v-btn>
+              </v-col>
+              <v-col>
+                <!-- <v-btn
+                  elevation="4"
+                  color="primary"
+                  @click="view"
+                >view</v-btn> -->
+              </v-col>
+            </v-row>
+            <v-row></v-row>
+            </v-form>
+          </v-card>
+        </v-col>
+        <v-col cols="auto">
+          <div v-if="employeeDetails.length>0">
+          <v-row>
+            <v-simple-table 
+              class="table">
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      Employee Id
+                    </th>
+                    <th class="text-center">
+                      Name
+                    </th>
+                    <th class="text-center">
+                      Email
+                    </th>
+                    <th class="text-center">
+                      Phone Number
+                    </th>
+                    <th class="text-center">
+                      Department Id
+                    </th>
+                    <th colspan="2" class="text-center">
+                      Action
+                    </th>
+                    
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(entry, index) in employeeDetails"
+                    :key="entry.employee_id"
+                  >
+                    <td class="text-center">{{ entry.employee_id }}</td>
+                    <td class="text-center">{{ entry.employee_name }}</td>
+                    <td class="text-center">{{ entry.employee_mail }}</td>
+                    <td class="text-center">{{ entry.employee_number }}</td>
+                    <td class="text-center">{{ entry.department_id }}</td>
+                    <td class="text-center">
+                    <v-icon 
+                      color="black"
+                      @click="editEmployee(index)">{{ icons.mdiPencil }}</v-icon>
+                    </td>
+                    <td class="text-center">
+                      <v-icon
+                        color="black" 
+                        @click="dialog = true">{{ icons.mdiDelete }}</v-icon>
+                    </td>
+                    
+                    <v-dialog
+                      v-model="dialog"
+                      persistent
+                      max-width="350"
+                    >
+                      <v-card>
+                        <v-card-title class="text-h5">
+                          Do you want to <b>delete</b> this record? 
+                        </v-card-title>
+                        <v-card-actions>
+                          <v-btn
+                            text
+                            @click="closeDialog"
+                          >Cancel</v-btn>
+                          <v-btn
+                            color="error"
+                            @click="deleteEmployee(index, entry.employee_id)"
+                          >Delete</v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-row>
           <v-row>
             <v-col></v-col>
-            <v-col>
-              <v-btn
-                elevation="4"
-                color="primary"
-                :disabled="isSubmitDisabled"
-                v-if="submitButton"
-                @click="submit"
-              >Submit</v-btn>
-              <v-btn
-                color="primary"
-                v-if="updateButton"
-                @click="updateEmployee">
-                Update
-              </v-btn>
-            </v-col>
-            <v-col>
-              <v-btn
-                elevation="4"
-                color="primary"
-                outlined
-                :disabled="isResetDisabled"
-                @click="reset"
-              >Reset</v-btn>
-            </v-col>
-            <v-col>
-              <!-- <v-btn
-                elevation="4"
-                color="primary"
-                @click="view"
-              >view</v-btn> -->
-            </v-col>
+              <h2>Total Count: {{ employeeDetails.length }}</h2>
+            <v-col></v-col>
           </v-row>
-          <v-row></v-row>
-          </v-form>
-        </v-card>
+          </div>
+        </v-col>
+      </v-row>
       </v-col>
-      <v-col cols="auto">
-        <div v-if="employeeDetails.length>0">
-        <v-row>
-          <v-simple-table 
-            class="table">
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th class="text-center">
-                    Employee Id
-                  </th>
-                  <th class="text-center">
-                    Name
-                  </th>
-                  <th class="text-center">
-                    Email
-                  </th>
-                  <th class="text-center">
-                    Phone Number
-                  </th>
-                  <th class="text-center">
-                    Department Id
-                  </th>
-                  <th colspan="2" class="text-center">
-                    Action
-                  </th>
-                  
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(entry, index) in employeeDetails"
-                  :key="entry.employee_id"
-                >
-                  <td class="text-center">{{ entry.employee_id }}</td>
-                  <td class="text-center">{{ entry.employee_name }}</td>
-                  <td class="text-center">{{ entry.employee_mail }}</td>
-                  <td class="text-center">{{ entry.employee_number }}</td>
-                  <td class="text-center">{{ entry.department_id }}</td>
-                  <td class="text-center">
-                  <v-icon 
-                    color="black"
-                    @click="editEmployee(index)">{{ icons.mdiPencil }}</v-icon>
-                  </td>
-                  <td class="text-center">
-                    <v-icon
-                      color="black" 
-                      @click="dialog = true">{{ icons.mdiDelete }}</v-icon>
-                  </td>
-                  
-                  <v-dialog
-                    v-model="dialog"
-                    persistent
-                    max-width="350"
-                  >
-                    <v-card>
-                      <v-card-title class="text-h5">
-                        Do you want to <b>delete</b> this record? 
-                      </v-card-title>
-                      <v-card-actions>
-                        <v-btn
-                          text
-                          @click="closeDialog()"
-                        >Cancel</v-btn>
-                        <v-btn
-                          color="error"
-                          @click="deleteEmployee(index, entry.employee_id)"
-                        >Delete</v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-dialog>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
-        </v-row>
-        <v-row>
-          <v-col></v-col>
-            <h2>Total Count: {{ employeeDetails.length }}</h2>
-          <v-col></v-col>
-        </v-row>
+      <v-col cols="1">
+        <div class="button">
+        <router-link to="/login" class="button">
+          <v-btn 
+          color="primary"
+          to="/login"
+          @click="logout">Logout</v-btn></router-link>
         </div>
       </v-col>
     </v-row>
@@ -211,6 +225,7 @@ export default {
         departmentId: '',
         departmentName:''
       },
+      user:'',
       name: '',
       email: '',
       passwordLength: '',
@@ -235,11 +250,10 @@ export default {
         department: [val => (val != '' && val != null) || 'Department is required'], 
       },
       departments: {},
-      departmentIds: [],
+      departmentsCheck: [],
       departmentNames: [],
       details: [],
       userDetails: [],
-
     }
   },
   mounted() {
@@ -254,17 +268,20 @@ export default {
       this.employeeDetails = response.data.reverse()
       // console.log(this.employeeDetails);
     })
+    const index = localStorage.getItem('user').indexOf('@')
+    console.log(localStorage.getItem('user').slice(0,index))
+    this.user = localStorage.getItem('user').slice(0,index)
     this.instance.get('/department/selectAll')
     .then((response) => {
       // console.log(response.data)
       this.departmentDetails = response.data.sort()
       for(let i=0; i<this.departmentDetails.length; i++){
-        this.departments[this.departmentDetails[i].department_name]= this.departmentDetails[i].department_id
-        this.departmentIds.push(this.departmentDetails[i].department_id)
+        this.departments[this.departmentDetails[i].department_name] = this.departmentDetails[i].department_id
+        this.departmentsCheck[this.departmentDetails[i].department_id] = this.departmentDetails[i].department_name
         this.departmentNames.push(this.departmentDetails[i].department_name)
       }
       // console.log(this.departments);
-      this.departmentIds.sort()
+      // console.log(this.departmentsCheck);
       // console.log(this.departmentNames);
     })
   },
@@ -279,19 +296,7 @@ export default {
         return true
       } else return false
     },
-  },
-  watch:{
-    passwordLength(value){
-      this.passwordLength = value
-      if(value<8 || value>20 || /^[a-zA-Z\s]*$/.test(value)){
-        this.password = ''
-      }
-      else{
-        this.generatePassword()
-      }
-    }
-  },
-  
+  },  
   methods:{
     view(){ 
       this.instance.get('/employee/selectAll')
@@ -300,8 +305,7 @@ export default {
         // console.log(this.employeeDetails);
       })
     },
-    submit(){ 
-      // this.alertMessage = false 
+    submit(){
       if(!this.$refs.form.validate()){
         console.log('error');
         this.snackbar = true
@@ -309,7 +313,7 @@ export default {
       else{
         this.snackbar = false
         this.employee.departmentId = this.departments[this.employee.departmentName]
-        console.log(this.employee.departmentId)
+        // console.log(this.employee.departmentId)
       
         this.instance.post('/employee/insert',{
           employeeName: this.employee.name,
@@ -335,7 +339,6 @@ export default {
         console.log(response.data)
         this.view()
       })
-      // this.employeeDetails.splice(index, 1)
       this.updateButton = false
       this.submitButton = true
       this.dialog = false
@@ -349,6 +352,7 @@ export default {
       this.employee.email = this.employeeDetails[id].employee_mail
       this.employee.phoneNumber = this.employeeDetails[id].employee_number
       this.employee.departmentId = this.employeeDetails[id].department_id
+      this.employee.departmentName = this.departmentsCheck[this.employee.departmentId]
       this.updateButton = true
       this.submitButton = false
     },
@@ -375,32 +379,24 @@ export default {
         this.view()
         this.$refs.form.reset()
       })
-      // this.employeeDetails[this.rowId].employee_name = this.employee.name
-      // this.employeeDetails[this.rowId].employee_mail = this.employee.email 
-      // this.employeeDetails[this.rowId].employee_number = this.employee.phoneNumber 
-      // this.employeeDetails[this.rowId].department_id = this.employee.departmentId 
       this.$refs.form.reset()
       this.updateButton = false
       this.submitButton = true
     },
     closeDialog(){
       this.dialog = false;
+    },
+    logout(){
+      
+      localStorage.clear()
+      this.$router.push({ path: "/login" })
     }
   }
 
 }
- // import HelloWorld from '../components/ArithmeticOperations'
 
-  // export default {
-  //   name: 'HomeView',
-
-  //   components: {
-  //     HelloWorld,
-  //   },
-  // }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h2{
   color:white
@@ -414,6 +410,10 @@ h1{
 }
 .table{
   margin-top: 5%;
+}
+.button{
+  margin-top: 10%;
+  text-decoration: none;
 }
 </style>
 
