@@ -56,10 +56,9 @@
           ></v-text-field>
 
           <v-combobox
-            v-model="employee.departmentId"
-            :rules="rules.department"
-            :items="departmentIds"
-            label="Department Id"
+            v-model="employee.departmentName"
+            :items="departmentNames"
+            label="Department Name"
             clearable
             outlined
           ></v-combobox>
@@ -77,7 +76,7 @@
               <v-btn
                 color="primary"
                 v-if="updateButton"
-                @click="updateEmployee()">
+                @click="updateEmployee">
                 Update
               </v-btn>
             </v-col>
@@ -209,7 +208,8 @@ export default {
         name: '',
         email: '',
         phoneNumber: '',
-        departmentId: ''
+        departmentId: '',
+        departmentName:''
       },
       name: '',
       email: '',
@@ -234,7 +234,7 @@ export default {
         phoneNumber: [val => (val != '' && val != null) || 'Phone Number is required', val => (!val) || /^[0-9]+$/.test(val) || 'Phone Number must be in numbers only'],
         department: [val => (val != '' && val != null) || 'Department is required'], 
       },
-      departments: [],
+      departments: {},
       departmentIds: [],
       departmentNames: [],
       details: [],
@@ -259,21 +259,23 @@ export default {
       // console.log(response.data)
       this.departmentDetails = response.data.sort()
       for(let i=0; i<this.departmentDetails.length; i++){
+        this.departments[this.departmentDetails[i].department_name]= this.departmentDetails[i].department_id
         this.departmentIds.push(this.departmentDetails[i].department_id)
         this.departmentNames.push(this.departmentDetails[i].department_name)
       }
+      // console.log(this.departments);
       this.departmentIds.sort()
       // console.log(this.departmentNames);
     })
   },
   computed:{
     isSubmitDisabled() {
-      if(!this.employee.name || !this.employee.email || !this.employee.phoneNumber || !this.employee.departmentId){
+      if(!this.employee.name || !this.employee.email || !this.employee.phoneNumber || !this.employee.departmentName){
         return true
       } else return false
     },
     isResetDisabled() {
-      if(!this.employee.name && !this.employee.email && !this.employee.phoneNumber && !this.employee.departmentId){
+      if(!this.employee.name && !this.employee.email && !this.employee.phoneNumber && !this.employee.departmentName){
         return true
       } else return false
     },
@@ -306,6 +308,9 @@ export default {
       }
       else{
         this.snackbar = false
+        this.employee.departmentId = this.departments[this.employee.departmentName]
+        console.log(this.employee.departmentId)
+      
         this.instance.post('/employee/insert',{
           employeeName: this.employee.name,
           employeeMail: this.employee.email.toLowerCase(),
