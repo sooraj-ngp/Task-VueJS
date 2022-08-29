@@ -4,7 +4,7 @@
     <v-row>
       <v-col>
         <h2>Hello {{user}}!</h2>
-        <v-row>
+      <v-row>
         <v-col
         cols="4">
           <v-card
@@ -262,27 +262,33 @@ export default {
         'Content-type': 'application/json'
       }
     })
-    this.instance.get('/employee/selectAll')
-    .then((response) => {
-      this.employeeDetails = response.data.reverse()
-      // console.log(this.employeeDetails);
-    })
-    const index = localStorage.getItem('user').indexOf('@')
-    console.log(localStorage.getItem('user').slice(0,index))
-    this.user = localStorage.getItem('user').slice(0,index)
-    this.instance.get('/department/selectAll')
-    .then((response) => {
-      // console.log(response.data)
-      this.departmentDetails = response.data.sort()
-      for(let i=0; i<this.departmentDetails.length; i++){
-        this.departments[this.departmentDetails[i].department_name] = this.departmentDetails[i].department_id
-        this.departmentsCheck[this.departmentDetails[i].department_id] = this.departmentDetails[i].department_name
-        this.departmentNames.push(this.departmentDetails[i].department_name)
-      }
-      // console.log(this.departments);
-      // console.log(this.departmentsCheck);
-      // console.log(this.departmentNames);
-    })
+    if(!localStorage.getItem('user')){
+      // console.log('hello',localStorage.getItem('user'));
+      this.$router.push({ path: "/login" })
+    }
+    else{
+      this.instance.get('/employee/selectAll')
+      .then((response) => {
+        this.employeeDetails = response.data.reverse()
+        // console.log(this.employeeDetails);
+      })
+      const index = localStorage.getItem('user').indexOf('@')
+      // console.log(localStorage.getItem('user').slice(0,index))
+      this.user = localStorage.getItem('user').slice(0,index)
+      this.instance.get('/department/selectAll')
+      .then((response) => {
+        // console.log(response.data)
+        this.departmentDetails = response.data.sort()
+        for(let i=0; i<this.departmentDetails.length; i++){
+          this.departments[this.departmentDetails[i].department_name] = this.departmentDetails[i].department_id
+          this.departmentsCheck[this.departmentDetails[i].department_id] = this.departmentDetails[i].department_name
+          this.departmentNames.push(this.departmentDetails[i].department_name)
+        }
+        // console.log(this.departments);
+        // console.log(this.departmentsCheck);
+        // console.log(this.departmentNames);
+      })
+    }
   },
   computed:{
     isSubmitDisabled() {

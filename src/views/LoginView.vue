@@ -77,9 +77,7 @@
 </template>
 
 <script>
-
 // import axios from 'axios';
-
 export default {
   data(){
     return {
@@ -112,7 +110,6 @@ export default {
       }
     }
 }
-
 </script>
 
 <style scoped>
@@ -129,4 +126,3 @@ h1{
   margin-top: 5%;
 }
 </style>
-
