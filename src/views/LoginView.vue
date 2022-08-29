@@ -12,7 +12,7 @@
           outlined
           tile
         >
-        <v-snackbar
+          <v-snackbar
             v-model="snackbar"
             :timeout="3000">
             Enter a valid input
@@ -50,15 +50,12 @@
             :rules="rules.password"
             outlined
             required
+            v-on:keyup.enter="login"
           ></v-text-field>
          
           <v-row>
             <v-col></v-col>
             <v-col>
-                <!-- <v-btn 
-                    color="primary"
-                    class="button"
-                    to="/"><router-link to="/login"></router-link>Login</v-btn> -->
               <v-btn
                 elevation="4"
                 color="primary"
@@ -72,6 +69,19 @@
         </v-card>
         </v-col>
         <v-col></v-col>
+          <v-snackbar
+            v-model="match"
+            :timeout="3000">
+            Email and Password does not match
+            <template v-slot:action="{ attrs }">
+              <v-btn
+                color="blue"
+                text
+                v-bind="attrs"
+                @click="snackbar = false"
+              >close</v-btn>
+            </template>
+          </v-snackbar>
     </v-row>
   </div>
 </template>
@@ -89,6 +99,7 @@ export default {
       },
       show: false,
       snackbar: false,
+      match: false,
       valid: true
     }
   },
@@ -99,9 +110,12 @@ export default {
         this.snackbar = true
       }
       else{
-        if(this.email.toLowerCase() == 'sooraj@gmail.com' || this.password == 'Sooraj!123'){
-            this.$router.push({ path: "/" })
+        if(this.email.toLowerCase() == 'sooraj@gmail.com' && this.password == 'Sooraj!123'){
+            this.$router.push({ path: "/home" })
             localStorage.setItem('user', this.email.toLowerCase())
+        }
+        else{
+          this.match = true
         }
       }
     },

@@ -12,7 +12,7 @@
             max-width="350"
             elevation="8"
             outlined
-            tile
+           
           >
           <v-snackbar
               v-model="snackbar"
@@ -60,6 +60,7 @@
 
             <v-combobox
               v-model="employee.departmentName"
+              :rules="rules.departmentName"
               :items="departmentNames"
               label="Department Name"
               clearable
@@ -92,11 +93,6 @@
                 >Reset</v-btn>
               </v-col>
               <v-col>
-                <!-- <v-btn
-                  elevation="4"
-                  color="primary"
-                  @click="view"
-                >view</v-btn> -->
               </v-col>
             </v-row>
             <v-row></v-row>
@@ -105,81 +101,7 @@
         </v-col>
         <v-col cols="auto">
           <div v-if="employeeDetails.length>0">
-          <v-row>
-            <!-- <v-simple-table 
-              class="table"
-              :search="search">
-              <template v-slot:default>
-                <thead>
-                  <tr>
-                    <th class="text-center">
-                      <b>Employee Id</b>
-                    </th>
-                    <th class="text-center">
-                      <b>Name</b>
-                    </th>
-                    <th class="text-center">
-                      <b>Email</b>
-                    </th>
-                    <th class="text-center">
-                      <b>Phone Number</b>
-                    </th>
-                    <th class="text-center">
-                      <b>Department Id</b>
-                    </th>
-                    <th colspan="2" class="text-center">
-                      <b>Action</b>
-                    </th>
-                    
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="(entry, index) in employeeDetails"
-                    :key="entry.employee_id"
-                  >
-                    <td class="text-center">{{ entry.employee_id }}</td>
-                    <td class="text-center">{{ entry.employee_name }}</td>
-                    <td class="text-center">{{ entry.employee_mail }}</td>
-                    <td class="text-center">{{ entry.employee_number }}</td>
-                    <td class="text-center">{{ entry.department_id }}</td>
-                    <td class="text-center">
-                    <v-icon 
-                      color="black"
-                      @click="editEmployee(index)">{{ icons.mdiPencil }}</v-icon>
-                    </td>
-                    <td class="text-center">
-                      <v-icon
-                        color="black" 
-                        @click="dialog = true">{{ icons.mdiDelete }}</v-icon>
-                    </td>
-                    
-                    <v-dialog
-                      v-model="dialog"
-                      persistent
-                      max-width="350"
-                    >
-                      <v-card>
-                        <v-card-title class="text-h5">
-                          Do you want to <b>delete</b> this record? 
-                        </v-card-title>
-                        <v-card-actions>
-                          <v-btn
-                            text
-                            @click="closeDialog"
-                          >Cancel</v-btn>
-                          <v-btn
-                            color="error"
-                            @click="deleteEmployee(index, entry.employee_id)"
-                          >Delete</v-btn>
-                        </v-card-actions>
-                      </v-card>
-                    </v-dialog>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table> -->
-            
+          <v-row>            
               <v-card>
                   <v-card-title>
                     Employee Details
@@ -245,10 +167,9 @@
       </v-col>
       <v-col cols="1">
         <div class="button">
-        <router-link to="/login">
           <v-btn 
           color="primary"
-          @click="logout">Logout</v-btn></router-link>
+          @click="logout">Logout</v-btn>
         </div>
       </v-col>
     </v-row>
@@ -308,7 +229,7 @@ export default {
         name: [val => (val != '' && val != null)|| 'Name is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'Name must be in alphabets only'],
         email: [val => (val != '' && val != null)|| 'Email is required', val => (!val) || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
         phoneNumber: [val => (val != '' && val != null) || 'Phone Number is required', val => (!val) || /^[0-9]+$/.test(val) || 'Phone Number must be in numbers only'],
-        department: [val => (val != '' && val != null) || 'Department is required'], 
+        departmentName: [val => (val != '' && val != null) || 'Department is required'], 
       },
       departments: {},
       departmentsCheck: [],
@@ -326,7 +247,7 @@ export default {
     })
     if(!localStorage.getItem('user')){
       // console.log('hello',localStorage.getItem('user'));
-      this.$router.push({ path: "/login" })
+      this.$router.push({ path: "/" })
     }
     else{
       this.instance.get('/employee/selectAll')
@@ -340,7 +261,7 @@ export default {
       this.instance.get('/department/selectAll')
       .then((response) => {
         // console.log(response.data)
-        this.departmentDetails = response.data.sort()
+        this.departmentDetails = response.data.reverse()
         for(let i=0; i<this.departmentDetails.length; i++){
           this.departments[this.departmentDetails[i].department_name] = this.departmentDetails[i].department_id
           this.departmentsCheck[this.departmentDetails[i].department_id] = this.departmentDetails[i].department_name
@@ -457,7 +378,7 @@ export default {
     },
     logout(){
       localStorage.clear();
-      this.$router.push({ path: "/login" })
+      this.$router.push({ path: "/" })
     }
   }
 
@@ -467,7 +388,7 @@ export default {
 
 <style scoped>
 h2{
-  color:white
+  color: white
 }
 h1{
   text-align: center;
