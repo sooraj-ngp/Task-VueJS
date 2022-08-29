@@ -99,9 +99,9 @@ export default {
         this.snackbar = true
       }
       else{
-        if(this.email == 'sooraj@gmail.com' || this.password == 'Sooraj!123'){
+        if(this.email.toLowerCase() == 'sooraj@gmail.com' || this.password == 'Sooraj!123'){
             this.$router.push({ path: "/" })
-            localStorage.setItem('user', this.email)
+            localStorage.setItem('user', this.email.toLowerCase())
         }
       }
     },

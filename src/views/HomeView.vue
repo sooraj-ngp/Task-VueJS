@@ -4,9 +4,9 @@
     <v-row>
       <v-col>
         <h2>Hello {{user}}!</h2>
-      <v-row>
+        <v-row>
         <v-col
-        cols="4">
+        cols="5 ">
           <v-card
             class="pa-2 card"
             max-width="350"
@@ -65,7 +65,6 @@
               clearable
               outlined
             ></v-combobox>
-            
             <v-row>
               <v-col></v-col>
               <v-col>
@@ -107,8 +106,9 @@
         <v-col cols="auto">
           <div v-if="employeeDetails.length>0">
           <v-row>
-            <v-simple-table 
-              class="table">
+            <!-- <v-simple-table 
+              class="table"
+              :search="search">
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -178,7 +178,61 @@
                   </tr>
                 </tbody>
               </template>
-            </v-simple-table>
+            </v-simple-table> -->
+            
+              <v-card>
+                  <v-card-title>
+                    Employee Details
+                    <v-spacer></v-spacer>
+                    <v-text-field
+                      v-model="search"
+                      append-icon="mdi-magnify"
+                      label="Search"
+                      single-line
+                      hide-details
+                    ></v-text-field>
+                  </v-card-title>
+                  <v-data-table
+                    :headers="headers"
+                    :items="employeeDetails"
+                    :search="search"
+                  >
+                    <template v-slot:[`item.actions`]="{ index, item }">
+                      <v-icon
+                        dense
+                        class="mr-2"
+                        @click="editEmployee(index, item)"
+                      >mdi-pencil</v-icon>
+                      <v-icon
+                        dense
+                        @click="deleteDialogClick()"
+                      >mdi-delete</v-icon>
+                      <v-dialog
+                        v-if="dialog"
+                        v-model="dialog"
+                        persistent
+                        max-width="375"
+                      >
+                        <v-card>
+                          <v-card-title>
+                            Do you want to delete this record? 
+                          </v-card-title>
+                          <v-card-actions>
+                            <v-btn
+                              text
+                              @click="deleteDialogClose"
+                            >Cancel</v-btn>
+                            <v-btn
+                              color="error"
+                              @click="deleteEmployee(item)"
+                            >Delete</v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </v-dialog>
+                    </template>             
+                  </v-data-table>
+                </v-card>
+                 
           </v-row>
           <v-row>
             <v-col></v-col>
@@ -226,22 +280,30 @@ export default {
       },
       user:'',
       name: '',
-      email: '',
-      passwordLength: '',
-      password: '',
+      search: '',
       alertMessage: false,
       valid: true,
       updateButton:false,
       submitButton:true,
       dialog: false,
-      location: '',
-      gender: '',
       instance: null,
       employeeDetails: [],
       departmentDetails: [],
       rowId: 0,
-      hobbies: [],
       snackbar: false,
+      headers: [
+        {
+          text: 'Employee Id',
+          align: 'center',
+          sortable: true,
+          value: 'employee_id',
+        },
+        { text: 'Name', align: 'center', value: 'employee_name' },
+        { text: 'Email', align: 'center', value: 'employee_mail' },
+        { text: 'Phone Number', align: 'center', value: 'employee_number' },
+        { text: 'Department Id', align: 'center', value: 'department_id' },
+        { text: 'Action', align: 'center', value: 'actions', sortable: false }
+      ],
       rules: {
         name: [val => (val != '' && val != null)|| 'Name is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'Name must be in alphabets only'],
         email: [val => (val != '' && val != null)|| 'Email is required', val => (!val) || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
@@ -274,7 +336,7 @@ export default {
       })
       const index = localStorage.getItem('user').indexOf('@')
       // console.log(localStorage.getItem('user').slice(0,index))
-      this.user = localStorage.getItem('user').slice(0,index)
+      this.user = localStorage.getItem('user').charAt(0).toUpperCase() + localStorage.getItem('user').slice(1, index)
       this.instance.get('/department/selectAll')
       .then((response) => {
         // console.log(response.data)
@@ -337,26 +399,31 @@ export default {
       this.updateButton = false
       this.submitButton = true
     },
-    deleteEmployee(index, id){
-      // console.log(index, id);
-      this.instance.delete('/employee/delete/'+id)
+    deleteDialogClick(){
+      console.log('click');
+      this.dialog = true
+    },
+    deleteDialogClose(){
+      console.log('close');
+      this.dialog = false
+    },
+    deleteEmployee(row){
+      // console.log(row);
+      this.instance.delete('/employee/delete/'+row.employee_id)
       .then((response) => {
         console.log(response.data)
         this.view()
       })
-      this.updateButton = false
-      this.submitButton = true
       this.dialog = false
     },
-    editEmployee(id){
-      // console.log(this.employeeDetails[id]);
-      console.log(this.employeeDetails[id].employee_id);
-      this.rowId = id
-      this.employee.id = this.employeeDetails[id].employee_id
-      this.employee.name = this.employeeDetails[id].employee_name
-      this.employee.email = this.employeeDetails[id].employee_mail
-      this.employee.phoneNumber = this.employeeDetails[id].employee_number
-      this.employee.departmentId = this.employeeDetails[id].department_id
+    editEmployee(index, row){
+      // console.log(index, ' : ', row);
+      this.rowId = index
+      this.employee.id = row.employee_id
+      this.employee.name = row.employee_name
+      this.employee.email = row.employee_mail
+      this.employee.phoneNumber = row.employee_number
+      this.employee.departmentId = row.department_id
       this.employee.departmentName = this.departmentsCheck[this.employee.departmentId]
       this.updateButton = true
       this.submitButton = false
@@ -387,9 +454,6 @@ export default {
       this.$refs.form.reset()
       this.updateButton = false
       this.submitButton = true
-    },
-    closeDialog(){
-      this.dialog = false;
     },
     logout(){
       localStorage.clear();
