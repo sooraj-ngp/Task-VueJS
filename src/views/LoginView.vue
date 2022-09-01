@@ -64,7 +64,6 @@
             </v-col>
             <v-col></v-col>
           </v-row>
-          <v-row></v-row>
           </v-form>
         </v-card>
         </v-col>

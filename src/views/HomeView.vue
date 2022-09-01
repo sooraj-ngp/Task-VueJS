@@ -102,59 +102,89 @@
         <v-col cols="auto">
           <div v-if="employeeDetails.length>0">
           <v-row>            
-              <v-card>
-                  <v-card-title>
-                    Employee Details
-                    <v-spacer></v-spacer>
-                    <v-text-field
-                      v-model="search"
-                      append-icon="mdi-magnify"
-                      label="Search"
-                      single-line
-                      hide-details
-                    ></v-text-field>
-                  </v-card-title>
-                  <v-data-table
-                    :headers="headers"
-                    :items="employeeDetails"
-                    :search="search"
+            <v-card>
+              <v-card-title>
+                Employee Details
+                <v-spacer></v-spacer>
+                <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+                ></v-text-field>
+              </v-card-title>
+              <v-data-table
+                :headers="headers"
+                :items="employeeDetails"
+                :search="search"
+              >
+              <!-- <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <span
+                    v-bind="attrs"
+                    v-on="on"
+                  >This text has a tooltip</span>
+                </template>
+                <span>Tooltip</span>
+              </v-tooltip>   -->
+                <template v-slot:[`item.employee_name`]="{ item }">
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                      <span
+                        v-bind="attrs"
+                        v-on="on"
+                      >{{item.employee_name | nameTruncate(item.employee_name)}}</span>
+                    </template>
+                  <span>{{ item.employee_name }}</span>
+                  </v-tooltip> 
+                </template> 
+                <template v-slot:[`item.employee_mail`]="{ item }">
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                      <span
+                        v-bind="attrs"
+                        v-on="on"
+                      >{{item.employee_mail | emailTruncate(item.employee_mail)}}</span>
+                    </template>
+                  <span>{{ item.employee_mail }}</span>
+                  </v-tooltip> 
+                </template> 
+                <template v-slot:[`item.actions`]="{ index, item }">
+                  <v-icon
+                    dense
+                    class="mr-2"
+                    @click="editEmployee(index, item)"
+                  >mdi-pencil</v-icon>
+                  <v-icon
+                    dense
+                    @click="deleteDialogClick(index, item)"
+                  >mdi-delete</v-icon>
+                  <v-dialog
+                    v-if="dialog"
+                    v-model="dialog"
+                    persistent
+                    max-width="375"
                   >
-                    <template v-slot:[`item.actions`]="{ index, item }">
-                      <v-icon
-                        dense
-                        class="mr-2"
-                        @click="editEmployee(index, item)"
-                      >mdi-pencil</v-icon>
-                      <v-icon
-                        dense
-                        @click="deleteDialogClick()"
-                      >mdi-delete</v-icon>
-                      <v-dialog
-                        v-if="dialog"
-                        v-model="dialog"
-                        persistent
-                        max-width="375"
-                      >
-                        <v-card>
-                          <v-card-title>
-                            Do you want to delete this record? 
-                          </v-card-title>
-                          <v-card-actions>
-                            <v-btn
-                              text
-                              @click="deleteDialogClose"
-                            >Cancel</v-btn>
-                            <v-btn
-                              color="error"
-                              @click="deleteEmployee(item)"
-                            >Delete</v-btn>
-                          </v-card-actions>
-                        </v-card>
-                      </v-dialog>
-                    </template>             
-                  </v-data-table>
-                </v-card>
-                 
+                    <v-card>
+                      <v-card-title>
+                        Do you want to delete this record? 
+                      </v-card-title>
+                      <v-card-actions>
+                        <v-btn
+                          text
+                          @click="dialog = false"
+                        >Cancel</v-btn>
+                        <v-btn
+                          color="error"
+                          @click="deleteEmployee()"
+                        >Delete</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </template>             
+              </v-data-table>
+            </v-card>    
           </v-row>
           <v-row>
             <v-col></v-col>
@@ -211,6 +241,7 @@ export default {
       employeeDetails: [],
       departmentDetails: [],
       rowId: 0,
+      rowDetail: [],
       snackbar: false,
       headers: [
         {
@@ -218,6 +249,7 @@ export default {
           align: 'center',
           sortable: true,
           value: 'employee_id',
+          
         },
         { text: 'Name', align: 'center', value: 'employee_name' },
         { text: 'Email', align: 'center', value: 'employee_mail' },
@@ -236,6 +268,8 @@ export default {
       departmentNames: [],
       details: [],
       userDetails: [],
+      newDetails: {},
+      oldDetails: {},
     }
   },
   mounted() {
@@ -273,6 +307,22 @@ export default {
       })
     }
   },
+  filters: {
+    nameTruncate: function(string) {
+      // console.log(string);
+      if (string.length > 6) {
+        string = string.substring(0, 6) + '...';
+      }
+      return string
+      },
+      emailTruncate: function(string) {
+      // console.log(string);
+      if (string.length > 10) {
+        string = string.substring(0, 10) + '...';
+      }
+      return string
+      }
+    },
   computed:{
     isSubmitDisabled() {
       if(!this.employee.name || !this.employee.email || !this.employee.phoneNumber || !this.employee.departmentName){
@@ -295,7 +345,7 @@ export default {
     },
     submit(){
       if(!this.$refs.form.validate()){
-        console.log('error');
+        // console.log('error');
         this.snackbar = true
       }
       else{
@@ -320,17 +370,18 @@ export default {
       this.updateButton = false
       this.submitButton = true
     },
-    deleteDialogClick(){
-      console.log('click');
+    deleteDialogClick(index, row){
+      // console.log('click');
       this.dialog = true
+      this.rowDetail = row
     },
-    deleteDialogClose(){
-      console.log('close');
-      this.dialog = false
-    },
-    deleteEmployee(row){
-      // console.log(row);
-      this.instance.delete('/employee/delete/'+row.employee_id)
+    // deleteDialogClose(){
+    //   console.log('close');
+    //   this.dialog = false
+    // },
+    deleteEmployee(){
+      // console.log(this.index,this.rowDetail.employee_id);
+      this.instance.delete('/employee/delete/'+this.rowDetail.employee_id)
       .then((response) => {
         console.log(response.data)
         this.view()
@@ -346,6 +397,7 @@ export default {
       this.employee.phoneNumber = row.employee_number
       this.employee.departmentId = row.department_id
       this.employee.departmentName = this.departmentsCheck[this.employee.departmentId]
+      // console.log(this.oldDetails);
       this.updateButton = true
       this.submitButton = false
     },
@@ -357,7 +409,7 @@ export default {
         updateDetails.employeeName = this.employee.name
       }
       if(this.employeeDetails[this.rowId].employee_mail != this.employee.email){
-        updateDetails.employeeMail = this.employee.email
+        updateDetails.employeeMail = this.employee.email.toLowerCase()
       }
       if(this.employeeDetails[this.rowId].employee_number != this.employee.phoneNumber){
         updateDetails.employeeNumber = this.employee.phoneNumber
@@ -372,7 +424,6 @@ export default {
         this.view()
         this.$refs.form.reset()
       })
-      this.$refs.form.reset()
       this.updateButton = false
       this.submitButton = true
     },
