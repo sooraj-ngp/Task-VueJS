@@ -1,0 +1,139 @@
+* {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: #daddfd;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 500;
+    line-height: 110%;
+    font-size: 15px;
+  }
+
+  section {
+    text-align: left;
+  }
+  
+  div {
+    top: 3%; 
+    height: 94%;
+  }
+  
+  article {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    padding: 20px;
+  }
+
+  h2 {
+    font-size: 35px;
+    font-weight: 500;
+  }
+
+  a{
+    
+    font-size: 15px;
+    font-weight: 500;
+    color: #5139ef;
+    text-decoration: none;
+  }
+
+  a:hover{
+    
+    font-size: 15px;
+    font-weight: 500;
+    color: #645f80;
+    text-decoration: none;
+  }
+  label{
+    font-weight: 400;
+  }
+  img{
+    vertical-align: middle;
+    margin-right: 10px;
+  }
+  input{
+    margin-top: 1.5%;
+  }
+  /* Pattern styles */
+  .container {
+    display: table;
+    width: 100%;
+  }
+  .contents{
+    margin-left: 20%;
+  }
+
+    .left-half {
+        background-color: white;
+        position: absolute;
+        left: 10%;
+        width: 41%;
+    }
+  
+    .right-half {
+        position: absolute;
+        right: 10%;
+        width: 39%;
+    }  
+
+.caption{
+    color: #64607e;
+}
+.footer{
+    color: #b9b7c9;
+    font-size: 13px;
+    font-weight: 400;
+}
+#logo{
+    margin-top: 4%;
+    margin-bottom: 2%;
+}
+#signupSplit{
+    width: 70%; 
+    height: 8px; 
+    border-bottom: 1px solid #e1deed; 
+    text-align: center;
+}
+.star{
+    color: #5139ef;
+}
+.splitText {
+    font-size: 12px; 
+    background-color:white; 
+    color: #e1deed;
+    padding: 0 10px;
+}
+
+.textbox {
+    width: 70%;
+    padding: 15px;
+    border: 1px solid #e1deed;
+    border-radius: 30px;
+}
+
+.googleButton {
+    background-color: white;
+    width: 70%;
+    padding: 10px;
+    border: 2px solid #e1deed;
+    border-radius: 30px;
+    font-weight: 600;
+}
+
+.submitButton {
+    color: white;
+    background-color: #5139ef;
+    font-weight: 600;
+    width: 70%;
+    padding: 10px;
+    border: 2px solid #5139ef;
+    border-radius: 30px;
+}
+.submitButton:hover{
+    color: black;
+    
+}
