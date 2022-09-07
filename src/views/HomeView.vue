@@ -100,14 +100,14 @@
           </v-card>
         </v-col>
         <v-col cols="auto">
-          <div v-if="employeeDetails.length>0">
+          <div>
           <v-row>            
             <v-card>
               <v-card-title>
                 Employee Details
                 <v-spacer></v-spacer>
                 <v-text-field
-                  v-model="search"
+                  v-model="searchString"
                   append-icon="mdi-magnify"
                   label="Search"
                   single-line
@@ -117,17 +117,7 @@
               <v-data-table
                 :headers="headers"
                 :items="employeeDetails"
-                :search="search"
               >
-              <!-- <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <span
-                    v-bind="attrs"
-                    v-on="on"
-                  >This text has a tooltip</span>
-                </template>
-                <span>Tooltip</span>
-              </v-tooltip>   -->
                 <template v-slot:[`item.employee_name`]="{ item }">
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
@@ -231,7 +221,7 @@ export default {
       },
       user:'',
       name: '',
-      search: '',
+      searchString: '',
       alertMessage: false,
       valid: true,
       updateButton:false,
@@ -272,11 +262,32 @@ export default {
       oldDetails: {},
     }
   },
+  watch:{
+    searchString(value){
+      this.searchString = value
+      if(this.searchString){
+        this.instance.get('/employee/selectAll/'+this.searchString)
+        .then((response) => {
+          this.employeeDetails = response.data
+          // console.log(this.employeeDetails);
+        })
+      }
+      else if(this.searchString == ''){
+        this.instance.get('/employee/selectAll/'+this.searchString)
+        .then((response) => {
+          this.employeeDetails = response.data
+          // console.log(this.employeeDetails);
+        })
+      }
+
+    }
+  },
   mounted() {
     this.instance = axios.create({
       baseURL: 'http://127.0.0.1:3333',
       headers:{
-        'Content-type': 'application/json'
+        'Content-type': 'application/json',
+        'AppKey':'0ba5ntcQizGig4A0W6FytENeoFiwnvTS'
       }
     })
     if(!localStorage.getItem('user')){
@@ -286,7 +297,7 @@ export default {
     else{
       this.instance.get('/employee/selectAll')
       .then((response) => {
-        this.employeeDetails = response.data.reverse()
+        this.employeeDetails = response.data
         // console.log(this.employeeDetails);
       })
       const index = localStorage.getItem('user').indexOf('@')
@@ -295,7 +306,7 @@ export default {
       this.instance.get('/department/selectAll')
       .then((response) => {
         // console.log(response.data)
-        this.departmentDetails = response.data.reverse()
+        this.departmentDetails = response.data
         for(let i=0; i<this.departmentDetails.length; i++){
           this.departments[this.departmentDetails[i].department_name] = this.departmentDetails[i].department_id
           this.departmentsCheck[this.departmentDetails[i].department_id] = this.departmentDetails[i].department_name
@@ -339,7 +350,7 @@ export default {
     view(){ 
       this.instance.get('/employee/selectAll')
       .then((response) => {
-        this.employeeDetails = response.data.reverse()
+        this.employeeDetails = response.data
         // console.log(this.employeeDetails);
       })
     },
