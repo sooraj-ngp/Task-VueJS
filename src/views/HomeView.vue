@@ -1,470 +1,680 @@
 <template>
   <!-- <hello-world /> -->
   <div>
-    <v-row>
-      <v-col>
-        <h2>Hello {{user}}!</h2>
-        <v-row>
-        <v-col
-        cols="5 ">
-          <v-card
-            class="pa-2 card"
-            max-width="350"
-            elevation="8"
-            outlined
-           
+    <v-row class="tree">
+      <!-- <v-col >
+        <treeselect 
+          v-model="value" 
+          :multiple="true" 
+          :options='options' 
+          :disable-branch-nodes="true" /><br><br>
+      </v-col> -->
+      <!-- <v-col>
+        <v-treeview
+          :active.sync="active"
+          :items="allData"
+          activatable
+          color="warning"
+          return-object
+          open-all
+          transition
+          @update:active="getTreeData"
+        ></v-treeview>
+      </v-col> -->
+      <v-col></v-col>
+      <v-col cols="8" class="ml-1">
+        <v-card>
+          <v-card-title class="indigo white--text text-h5">
+            Sample Data
+          </v-card-title>
+          <v-row
+            class="pa-4"
+            justify="space-between"
           >
-          <v-snackbar
-              v-model="snackbar"
-              :timeout="3000">
-              Enter a valid input
-              <template v-slot:action="{ attrs }">
-                <v-btn
-                  color="blue"
-                  text
-                  v-bind="attrs"
-                  @click="snackbar = false"
-                >close</v-btn>
-              </template>
-            </v-snackbar>
-            <v-form
-              ref="form"
-              v-model="valid"
-              lazy-validation>
-              <h1>Employee </h1>
-            <v-text-field
-              v-model="employee.name"
-              :rules="rules.name"
-              color="blue darken-2"
-              label="Name"
-              outlined
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="employee.email"
-              :rules="rules.email"
-              color="blue darken-2"
-              label="Email"
-              outlined
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="employee.phoneNumber"
-              color="blue darken-2"
-              label="Phone Number"
-              maxlength="10"
-              :rules="rules.phoneNumber"
-              outlined
-              required
-            ></v-text-field>
-
-            <v-combobox
-              v-model="employee.departmentName"
-              :rules="rules.departmentName"
-              :items="departmentNames"
-              label="Department Name"
-              clearable
-              outlined
-            ></v-combobox>
-            <v-row>
-              <v-col></v-col>
-              <v-col>
-                <v-btn
-                  elevation="4"
-                  color="primary"
-                  :disabled="isSubmitDisabled"
-                  v-if="submitButton"
-                  @click="submit"
-                >Submit</v-btn>
-                <v-btn
-                  color="primary"
-                  v-if="updateButton"
-                  @click="updateEmployee">
-                  Update
-                </v-btn>
-              </v-col>
-              <v-col>
-                <v-btn
-                  elevation="4"
-                  color="primary"
-                  outlined
-                  :disabled="isResetDisabled"
-                  @click="reset"
-                >Reset</v-btn>
-              </v-col>
-              <v-col>
-              </v-col>
-            </v-row>
-            <v-row></v-row>
-            </v-form>
-          </v-card>
-        </v-col>
-        <v-col cols="auto">
-          <div>
-          <v-row>            
-            <v-card>
-              <v-card-title>
-                Employee Details
-                <v-spacer></v-spacer>
-                <v-text-field
-                  v-model="searchString"
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                ></v-text-field>
-              </v-card-title>
-              <v-data-table
-                :headers="headers"
-                :items="employeeDetails"
+            <v-col cols="6">
+              <v-treeview
+                open-all
+                :active.sync="active"
+                :items="allData"
+                activatable
+                color="warning"
+                return-object
+                transition
+                @update:active="getTreeData"
               >
-                <template v-slot:[`item.employee_name`]="{ item }">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span
-                        v-bind="attrs"
-                        v-on="on"
-                      >{{item.employee_name | nameTruncate(item.employee_name)}}</span>
-                    </template>
-                  <span>{{ item.employee_name }}</span>
-                  </v-tooltip> 
-                </template> 
-                <template v-slot:[`item.employee_mail`]="{ item }">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span
-                        v-bind="attrs"
-                        v-on="on"
-                      >{{item.employee_mail | emailTruncate(item.employee_mail)}}</span>
-                    </template>
-                  <span>{{ item.employee_mail }}</span>
-                  </v-tooltip> 
-                </template> 
-                <template v-slot:[`item.actions`]="{ index, item }">
-                  <v-icon
-                    dense
-                    class="mr-2"
-                    @click="editEmployee(index, item)"
-                  >mdi-pencil</v-icon>
-                  <v-icon
-                    dense
-                    @click="deleteDialogClick(index, item)"
-                  >mdi-delete</v-icon>
-                  <v-dialog
-                    v-if="dialog"
-                    v-model="dialog"
-                    persistent
-                    max-width="375"
-                  >
-                    <v-card>
-                      <v-card-title>
-                        Do you want to delete this record? 
-                      </v-card-title>
-                      <v-card-actions>
-                        <v-btn
-                          text
-                          @click="dialog = false"
-                        >Cancel</v-btn>
-                        <v-btn
-                          color="error"
-                          @click="deleteEmployee()"
-                        >Delete</v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-dialog>
-                </template>             
-              </v-data-table>
-            </v-card>    
+                <template v-slot:prepend="{ item }">
+                  <v-icon v-if="!item.children">
+                    mdi-account
+                  </v-icon>
+                </template>
+              </v-treeview>
+            </v-col>
+
+            <v-divider vertical></v-divider>
+
+            <v-col
+              class="d-flex text-center"
+            >
+              <v-scroll-y-transition mode="out-in">
+                <div
+                  v-if="!active"
+                  class="text-h6 grey--text text--lighten-1 font-weight-light"
+                  style="align-self: center;"
+                >
+                  Select an Item
+                </div>
+                <v-card
+                  v-else
+                  class=""
+                  flat
+                  max-width="500"
+                >
+                  <v-card-text class="text-left">
+                    <span v-for="(item,key) in result" :key="key">
+                      <b v-if="(typeof(item)!='object')">{{key}}</b>
+                      <span v-if="(typeof(item)!='object')">:{{ (item && item!='undefined'&& item!=null) ? item : "No data found"}}<br></span>
+                      <!-- <span v-if="(typeof(item)=='object')"><b>{{key}}</b>:<br>
+                        <span v-for="(innerItem) in item" :key="innerItem">
+                          <ul>
+                            <li>
+                              <span v-for="(value, innerKey) in innerItem" :key="innerKey.name" class="ml-4">
+                                <span v-if="(typeof(item)=='object')">{{innerKey}} : {{value && value!='undefined' && value!=null ? value : "No data found"}}</span><br>
+                              </span> 
+                            </li>
+                          </ul>
+                        </span>
+                      </span> -->
+                    </span>
+                    <!-- <span v-for="(item,key) in result" :key="item">
+                      <b v-if="(typeof(item)!='object')">{{key}}</b>:{{item}}<br>
+                    </span> -->
+                  </v-card-text>
+                </v-card>
+              </v-scroll-y-transition>
+            </v-col>
           </v-row>
-          <v-row>
-            <v-col></v-col>
-              <h2>Total Count: {{ employeeDetails.length }}</h2>
-            <v-col></v-col>
-          </v-row>
-          </div>
-        </v-col>
-      </v-row>
+        </v-card>
       </v-col>
-      <v-col cols="1">
-        <div class="button">
-          <v-btn 
-          color="primary"
-          @click="logout">Logout</v-btn>
-        </div>
-      </v-col>
+      <v-col></v-col>
     </v-row>
+    <v-row>
+      <v-col></v-col>
+      <v-col cols="auto" class="pr-1">
+        <v-simple-table v-if="switchRoomList">
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-center">
+                  distanceToLocalDb
+                </th>
+                <th class="text-center">
+                  imageFlag
+                </th>
+                <th class="text-center">
+                  localDbRef
+                </th>
+                <th class="text-center">
+                  name
+                </th>
+                <th class="text-center">
+                  networkPointAvailable
+                </th>
+                <th class="text-center">
+                  networkPointToBeInstalled
+                </th>
+                <th class="text-center">
+                  notes
+                </th>
+                <th class="text-center">
+                  routerRequired
+                </th>
+                <th class="text-center">
+                  spareWayAtDb
+                </th>
+                <th class="text-center">
+                  switchRoomId
+                </th>
+                <th class="text-center">
+                  threePhaseRefAvailable
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="item in switchRoomList"
+                :key="item.switchRoomId"
+              >
+                <td class="text-center">{{ (item.distanceToLocalDb && item.distanceToLocalDb!='undefined' && item.distanceToLocalDb != null) ? item.distanceToLocalDb : "No data found"}}</td>
+                <td class="text-center">{{ item.imageFlag && item.imageFlag!='undefined' ? item.imageFlag : "No data found"}}</td>
+                <td class="text-center">{{ item.localDbRef && item.localDbRef!='undefined' ? item.localDbRef : "No data found"}}</td>
+                <td class="text-center">{{ item.name && item.name!='undefined' ? item.name : "No data found"}}</td>
+                <td class="text-center">{{ item.networkPointAvailable && item.networkPointAvailable!='undefined' ? item.networkPointAvailable : "No data found"}}</td>
+                <td class="text-center">{{ item.networkPointToBeInstalled && item.networkPointToBeInstalled!='undefined' ? item.networkPointToBeInstalled : "No data found"}}</td>
+                <td class="text-center">{{ item.notes && item.notes!='undefined' ? item.notes : "No data found"}}</td>
+                <td class="text-center">{{ item.routerRequired && item.routerRequired!='undefined' ? item.routerRequired : "No data found"}}</td>
+                <td class="text-center">{{ item.spareWayAtDb && item.spareWayAtDb!='undefined' ? item.spareWayAtDb : "No data found"}}</td>
+                <td class="text-center">{{ item.switchRoomId && item.switchRoomId!='undefined' ? item.switchRoomId : "No data found"}}</td>
+                <td class="text-center">{{ item.threePhaseRefAvailable && item.threePhaseRefAvailable!='undefined' ? item.threePhaseRefAvailable : "No data found"}}</td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+        <v-simple-table v-if="channelList">
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-center">
+                  Channel Id
+                </th>
+                <th class="text-center">
+                  Created By
+                </th>
+                <th class="text-center">
+                  Phase
+                </th>
+                <th class="text-center">
+                  Phase Type
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="item in channelList"
+                :key="item.channelId"
+              >
+                <td class="text-center">{{ item.channelId }}</td>
+                <td class="text-center">{{ item.createdBy }}</td>
+                <td class="text-left ml-5">
+                  <span v-for="phaseItem,index in item.phase" :key="index">
+                  <span v-for="phaseInnerItem, innerKey, index in phaseItem" :key="index">
+                      {{ innerKey }} : {{ phaseInnerItem }}<br>
+                  </span>
+                  </span>
+                </td>
+                <td class="text-center">{{ item.phaseType }}</td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+        <v-simple-table v-if="site">
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-center">
+                  add2
+                </th>
+                <th class="text-center">
+                  city
+                </th>
+                <th class="text-center">
+                  country
+                </th>
+                <th class="text-center">
+                  line_1
+                </th>
+                <th class="text-center">
+                  line_2
+                </th>
+                <th class="text-center">
+                  postcode
+                </th>
+                <th class="text-center">
+                  road
+                </th>
+                <th class="text-center">
+                  site_name
+                </th>
+                <th class="text-center">
+                  town
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <!-- v-for="item in site"
+                :key="item.site_name" -->
+                <td class="text-center"> {{ site.add2 && site.add2!=null ? site.add2 : "No data found"}} </td>
+                <td class="text-center"> {{ site.city && site.city!=null ? site.city : "No data found" }} </td>
+                <td class="text-center"> {{ site.country && site.country!=null ? site.country : "No data found" }} </td>
+                <td class="text-center"> {{ site.line_1 && site.line_1!=null ? site.line_1 : "No data found" }} </td>
+                <td class="text-center"> {{ site.line_2 && site.line_2!=null ? site.line_2 : "No data found" }} </td>
+                <td class="text-center"> {{ site.postcode && site.postcode!=null ? site.postcode : "No data found" }} </td>
+                <td class="text-center"> {{ site.road && site.road!=null ? site.road : "No data found" }} </td>
+                <td class="text-center"> {{ site.site_name && site.site_name!=null ? site.site_name : "No data found" }} </td>
+                <td class="text-center"> {{ site.town && site.town!=null ? site.town : "No data found" }} </td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+      </v-col>
+      <v-col></v-col>
+    </v-row>
+
   </div>
 </template>
 
 <script>
-import {
-  mdiPencil,
-  mdiDelete,
-} from '@mdi/js'
-
-import axios from 'axios';
-
-export default {
+// import Treeselect from '@riophae/vue-treeselect'
+// import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+export default {    
+  // components: { Treeselect },
+  mounted() {
+    this.allData =  this.sample[0]["data"]
+    this.channelList = null
+    this.switchRoomList = null
+    this.site = null
+    // console.log(this.sample[0]["data"][0]);
+    console.log(this.allData);
+  },
+  methods: {
+    getTreeData(){
+      this.result = this.active[0].dataValues
+      this.switchRoomList = this.active[0].dataValues.switchRoomList
+      this.channelList = this.active[0].dataValues.channelList
+      this.site = this.active[0].dataValues.site
+      if(this.channelList){
+        this.site = null
+        this.switchRoomList = null
+      }
+      if(this.site){
+        this.channelList=null
+        this.switchRoomList = null
+      }
+      if(this.switchRoomList){
+        this.site = null
+        this.channelList=null
+      }
+      console.log(this.active[0].dataValues);
+      console.log(this.channelList, this.site, this.switchRoomList);
+    }
+  },
   data(){
     return {
-      icons: {
-        mdiPencil,
-        mdiDelete,
-      },
-      employee:{
-        id: '',
-        name: '',
-        email: '',
-        phoneNumber: '',
-        departmentId: '',
-        departmentName:''
-      },
-      user:'',
-      name: '',
-      searchString: '',
-      alertMessage: false,
-      valid: true,
-      updateButton:false,
-      submitButton:true,
-      dialog: false,
-      instance: null,
-      employeeDetails: [],
-      departmentDetails: [],
-      rowId: 0,
-      rowDetail: [],
-      snackbar: false,
-      headers: [
-        {
-          text: 'Employee Id',
-          align: 'center',
-          sortable: true,
-          value: 'employee_id',
-          
-        },
-        { text: 'Name', align: 'center', value: 'employee_name' },
-        { text: 'Email', align: 'center', value: 'employee_mail' },
-        { text: 'Phone Number', align: 'center', value: 'employee_number' },
-        { text: 'Department Id', align: 'center', value: 'department_id' },
-        { text: 'Action', align: 'center', value: 'actions', sortable: false }
-      ],
-      rules: {
-        name: [val => (val != '' && val != null)|| 'Name is required', val => (!val) || /^[a-zA-Z\s]*$/.test(val) || 'Name must be in alphabets only'],
-        email: [val => (val != '' && val != null)|| 'Email is required', val => (!val) || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'E-mail must be valid'],
-        phoneNumber: [val => (val != '' && val != null) || 'Phone Number is required', val => (!val) || /^[0-9]+$/.test(val) || 'Phone Number must be in numbers only'],
-        departmentName: [val => (val != '' && val != null) || 'Department is required'], 
-      },
-      departments: {},
-      departmentsCheck: [],
-      departmentNames: [],
-      details: [],
-      userDetails: [],
-      newDetails: {},
-      oldDetails: {},
+      value: null,
+      tree: [],
+      allData: [],
+      channelList: [],
+      switchRoomList: [],
+      site: [],
+      sampleData: [],
+      active: [],
+      result: [],
+      options: [ {
+        id: 'a',
+        label: 'a',
+        children: [ {
+          id: 'aa',
+          label: 'aa',
+        }, {
+          id: 'ab',
+          label: 'ab',
+        } ],
+      }, {
+        id: 'b',
+        label: 'b',
+      }, {
+        id: 'c',
+        label: 'c',
+        children: [ {
+          id: 'ca',
+          label: 'ca',
+        },{
+          id: 'cb',
+          label: 'cb',
+        } ],
+      } ],
+      files: {
+        site: "bi bi-geo-alt-fill",
+        meter: "bi bi-speedometer",
+        room: "bi bi-door-open-fill",
+        cabinet: "bi bi-inboxes-fill",
+        meterElectricity: "fas fa-bolt",
+        meterGas: "fas fa-burn",
+        building: "fa fa-building",
+        distributionBoard: "bi bi-diagram-2-fill",
+        subDistributionBoard: "bi bi-diagram-3-fill",
+        device: "bi bi-hdd-network-fill",
+        gasLogger: "bi bi-file-medical-fill",
+        circuit: "bi bi-cpu-fill",
+        busbar: "fas fa-bacon",
+      }, 
+      sample: [ {
+        "success": true,
+        "data": [
+          {
+            "id": 5981,
+            "dataValues": {
+              "name": "Bakehouse Prestwick",
+              "town": "Prestwick",
+              "country": "UK",
+              "address1": "71-75 Main St.",
+              "postcode": "KA9 1JN",
+              "siteVisitDate": "2022-07-11"
+            },
+            "category": "Site",
+            "iconName": "bi bi-geo-alt-fill",
+            "categoryId": 2,
+            "parentId": 5980,
+            "count": "1",
+            "childIds": "6154",
+            "connectedTo": [],
+            "colorCode": "#1e88e5",
+            "feederCircuitId": null,
+            "switchRoomImage": [],
+            "busbarId": null,
+            "subdbName": null,
+            "file": "site",
+            "name": "Bakehouse Prestwick",
+            "children": [
+              {
+                "id": 6154,
+                "dataValues": {
+                  "name": "Bakehouse Prestwick Building",
+                  "floorCount": null
+                },
+                "category": "Building",
+                "iconName": "fa fa-building",
+                "categoryId": 4,
+                "parentId": 5981,
+                "count": "1",
+                "childIds": "6155",
+                "connectedTo": [],
+                "colorCode": "#1e88e5",
+                "feederCircuitId": null,
+                "switchRoomImage": [],
+                "busbarId": null,
+                "subdbName": null,
+                "file": "building",
+                "name": "Bakehouse Prestwick Building",
+                "children": [
+                  {
+                    "id": 6155,
+                    "dataValues": {
+                      "name": "Meter Room",
+                      "floor": "undefined"
+                    },
+                    "category": "Room",
+                    "iconName": "bi bi-door-open-fill",
+                    "categoryId": 15,
+                    "parentId": 6154,
+                    "count": "3",
+                    "childIds": "6156,6166,6145",
+                    "connectedTo": [],
+                    "colorCode": "#1e88e5",
+                    "feederCircuitId": null,
+                    "switchRoomImage": [],
+                    "busbarId": null,
+                    "subdbName": null,
+                    "file": "room",
+                    "name": "Meter Room",
+                    "children": [
+                      {
+                        "id": 6156,
+                        "dataValues": {
+                          "name": "Cab 1"
+                        },
+                        "category": "Cabinet",
+                        "iconName": "bi bi-inboxes-fill",
+                        "categoryId": 11,
+                        "parentId": 6155,
+                        "count": "2",
+                        "childIds": "6148,6153",
+                        "connectedTo": [],
+                        "colorCode": "#1e88e5",
+                        "feederCircuitId": null,
+                        "switchRoomImage": [],
+                        "busbarId": null,
+                        "subdbName": null,
+                        "file": "cabinet",
+                        "name": "Cab 1",
+                        "children": [
+                          {
+                            "id": 6148,
+                            "dataValues": {
+                              "name": "BHP Meter DB",
+                              "switchRoomList": [
+                                {
+                                  "name": "BHP Meter DB",
+                                  "notes": null,
+                                  "imageFlag": "true",
+                                  "localDbRef": null,
+                                  "spareWayAtDb": "0",
+                                  "switchRoomId": "6148",
+                                  "routerRequired": "0",
+                                  "distanceToLocalDb": null,
+                                  "networkPointAvailable": "0",
+                                  "threePhaseRefAvailable": "0",
+                                  "networkPointToBeInstalled": "0"
+                                }
+                              ]
+                            },
+                            "category": "Distribution Board",
+                            "iconName": "bi bi-diagram-2-fill",
+                            "categoryId": 5,
+                            "parentId": 6156,
+                            "count": "7",
+                            "childIds": "6150,6167,6151,6169,6152,6149,6168",
+                            "connectedTo": [
+                              6145
+                            ],
+                            "colorCode": "#1e88e5",
+                            "feederCircuitId": 0,
+                            "switchRoomImage": [],
+                            "busbarId": null,
+                            "subdbName": null,
+                            "file": "distributionBoard",
+                            "name": "BHP Meter DB",
+                            "children": []
+                          },
+                          {
+                            "id": 6153,
+                            "dataValues": {
+                              "name": "BHP Device(54:10:ec:a7:d9:44)",
+                              "macId": "54:10:ec:a7:d9:44",
+                              "comment": null,
+                              "channelList": [
+                                {
+                                  "phase": [
+                                    {
+                                      "dbId": "6148",
+                                      "phaseId": "1",
+                                      "circuitId": "6149",
+                                      "phaseName": "Main Incomer",
+                                      "breakerRef": "30",
+                                      "ctTypeValue": "30",
+                                      "classification": "Electrical Distribution & Use"
+                                    }
+                                  ],
+                                  "channelId": "1",
+                                  "createdBy": "test_umesh@powerofn.in",
+                                  "phaseType": "3"
+                                },
+                                {
+                                  "phase": [
+                                    {
+                                      "dbId": "6148",
+                                      "phaseId": "1",
+                                      "circuitId": "6150",
+                                      "phaseName": "PIZZA OVEN",
+                                      "breakerRef": "30",
+                                      "ctTypeValue": "30",
+                                      "classification": "Boiler"
+                                    }
+                                  ],
+                                  "channelId": "2",
+                                  "createdBy": "test_umesh@powerofn.in",
+                                  "phaseType": "3"
+                                },
+                                {
+                                  "phase": [
+                                    {
+                                      "dbId": "6148",
+                                      "phaseId": "1",
+                                      "circuitId": "6151",
+                                      "phaseName": "LAINOX OVEN",
+                                      "breakerRef": "30",
+                                      "ctTypeValue": "30",
+                                      "classification": "Compressed Air"
+                                    }
+                                  ],
+                                  "channelId": "3",
+                                  "createdBy": "test_umesh@powerofn.in",
+                                  "phaseType": "3"
+                                },
+                                {
+                                  "phase": [
+                                    {
+                                      "dbId": "6148",
+                                      "phaseId": "1",
+                                      "circuitId": "6152",
+                                      "phaseName": "COMBI OVEN",
+                                      "breakerRef": "30",
+                                      "ctTypeValue": "30",
+                                      "classification": "Kettle"
+                                    }
+                                  ],
+                                  "channelId": "4",
+                                  "createdBy": "test_umesh@powerofn.in",
+                                  "phaseType": "3"
+                                },
+                                {
+                                  "phase": [
+                                    {
+                                      "dbId": "6148",
+                                      "phaseId": "1",
+                                      "circuitId": "6168",
+                                      "phaseName": "Test 2",
+                                      "breakerRef": "80",
+                                      "ctTypeValue": "120",
+                                      "classification": null
+                                    },
+                                    {
+                                      "dbId": "6148",
+                                      "phaseId": "2",
+                                      "circuitId": "6169",
+                                      "phaseName": "Test 3",
+                                      "breakerRef": "80",
+                                      "ctTypeValue": "120",
+                                      "classification": "Refrigeration"
+                                    },
+                                    {
+                                      "dbId": "6148",
+                                      "phaseId": "3",
+                                      "circuitId": "6167",
+                                      "phaseName": "Test 1",
+                                      "breakerRef": "60",
+                                      "ctTypeValue": "60",
+                                      "classification": "Process Energy"
+                                    }
+                                  ],
+                                  "channelId": "5",
+                                  "createdBy": "test_umesh@powerofn.in",
+                                  "phaseType": "1"
+                                }
+                              ]
+                            },
+                            "category": "Device",
+                            "iconName": "bi bi-hdd-network-fill",
+                            "categoryId": 7,
+                            "parentId": 6156,
+                            "count": "0",
+                            "childIds": null,
+                            "connectedTo": [
+                              6148
+                            ],
+                            "colorCode": "#1e88e5",
+                            "feederCircuitId": null,
+                            "switchRoomImage": [],
+                            "busbarId": null,
+                            "subdbName": null,
+                            "file": "device",
+                            "name": "BHP Device(54:10:ec:a7:d9:44)",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "id": 6145,
+                        "dataValues": {
+                          "loa": null,
+                          "mpan": "1800060712129",
+                          "site": {
+                            "add2": null,
+                            "city": "Prestwick",
+                            "road": null,
+                            "town": null,
+                            "line_1": null,
+                            "line_2": "71-75 Main St.",
+                            "country": null,
+                            "postcode": "KA9 1JN",
+                            "site_name": "Bakehouse Prestwick"
+                          },
+                          "type": "ELEC",
+                          "meter": "1800060712129",
+                          "eacKWh": null,
+                          "eac_aq": null,
+                          "status": null,
+                          "gasMprn": null,
+                          "category": null,
+                          "end_date": null,
+                          "mpan_top": "03801D04",
+                          "supplier": null,
+                          "exp_value": null,
+                          "meterName": "Bakehouse Prestwick Meter"
+                        },
+                        "category": "Meter",
+                        "iconName": "bi bi-speedometer2",
+                        "categoryId": 3,
+                        "parentId": 6155,
+                        "count": "0",
+                        "childIds": null,
+                        "connectedTo": [],
+                        "colorCode": "#1e88e5",
+                        "feederCircuitId": null,
+                        "switchRoomImage": [],
+                        "busbarId": null,
+                        "subdbName": null,
+                        "file": "meter",
+                        "name": "Bakehouse Prestwick Meter",
+                        "children": []
+                      },
+                      {
+                        "id": 6166,
+                        "dataValues": {
+                          "name": "Main Busbar"
+                        },
+                        "category": "Busbar",
+                        "iconName": null,
+                        "categoryId": 20,
+                        "parentId": 6155,
+                        "count": "0",
+                        "childIds": null,
+                        "connectedTo": [],
+                        "colorCode": "#1e88e5",
+                        "feederCircuitId": null,
+                        "switchRoomImage": [],
+                        "busbarId": null,
+                        "subdbName": null,
+                        "file": "busbar",
+                        "name": "Main Busbar",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }],
     }
   },
-  watch:{
-    searchString(value){
-      this.searchString = value
-      if(this.searchString){
-        this.instance.get('/employee/selectAll/'+this.searchString)
-        .then((response) => {
-          this.employeeDetails = response.data
-          // console.log(this.employeeDetails);
-        })
-      }
-      else if(this.searchString == ''){
-        this.instance.get('/employee/selectAll/'+this.searchString)
-        .then((response) => {
-          this.employeeDetails = response.data
-          // console.log(this.employeeDetails);
-        })
-      }
-
-    }
-  },
-  mounted() {
-    this.instance = axios.create({
-      baseURL: 'http://127.0.0.1:3333',
-      headers:{
-        'Content-type': 'application/json',
-        'AppKey':'0ba5ntcQizGig4A0W6FytENeoFiwnvTS'
-      }
-    })
-    if(!localStorage.getItem('user')){
-      // console.log('hello',localStorage.getItem('user'));
-      this.$router.push({ path: "/" })
-    }
-    else{
-      this.instance.get('/employee/selectAll')
-      .then((response) => {
-        this.employeeDetails = response.data
-        // console.log(this.employeeDetails);
-      })
-      const index = localStorage.getItem('user').indexOf('@')
-      // console.log(localStorage.getItem('user').slice(0,index))
-      this.user = localStorage.getItem('user').charAt(0).toUpperCase() + localStorage.getItem('user').slice(1, index)
-      this.instance.get('/department/selectAll')
-      .then((response) => {
-        // console.log(response.data)
-        this.departmentDetails = response.data
-        for(let i=0; i<this.departmentDetails.length; i++){
-          this.departments[this.departmentDetails[i].department_name] = this.departmentDetails[i].department_id
-          this.departmentsCheck[this.departmentDetails[i].department_id] = this.departmentDetails[i].department_name
-          this.departmentNames.push(this.departmentDetails[i].department_name)
-        }
-        // console.log(this.departments);
-        // console.log(this.departmentsCheck);
-        // console.log(this.departmentNames);
-      })
-    }
-  },
-  filters: {
-    nameTruncate: function(string) {
-      // console.log(string);
-      if (string.length > 6) {
-        string = string.substring(0, 6) + '...';
-      }
-      return string
-      },
-      emailTruncate: function(string) {
-      // console.log(string);
-      if (string.length > 10) {
-        string = string.substring(0, 10) + '...';
-      }
-      return string
-      }
-    },
-  computed:{
-    isSubmitDisabled() {
-      if(!this.employee.name || !this.employee.email || !this.employee.phoneNumber || !this.employee.departmentName){
-        return true
-      } else return false
-    },
-    isResetDisabled() {
-      if(!this.employee.name && !this.employee.email && !this.employee.phoneNumber && !this.employee.departmentName){
-        return true
-      } else return false
-    },
-  },  
-  methods:{
-    view(){ 
-      this.instance.get('/employee/selectAll')
-      .then((response) => {
-        this.employeeDetails = response.data
-        // console.log(this.employeeDetails);
-      })
-    },
-    submit(){
-      if(!this.$refs.form.validate()){
-        // console.log('error');
-        this.snackbar = true
-      }
-      else{
-        this.snackbar = false
-        this.employee.departmentId = this.departments[this.employee.departmentName]
-        // console.log(this.employee.departmentId)
-      
-        this.instance.post('/employee/insert',{
-          employeeName: this.employee.name,
-          employeeMail: this.employee.email.toLowerCase(),
-          employeeNumber: this.employee.phoneNumber,
-          departmentId: this.employee.departmentId
-        }).then((response) => {
-          console.log(response.data)
-          this.view()
-          this.$refs.form.reset()
-        })
-      }
-    },
-    reset(){
-      this.$refs.form.reset()
-      this.updateButton = false
-      this.submitButton = true
-    },
-    deleteDialogClick(index, row){
-      // console.log('click');
-      this.dialog = true
-      this.rowDetail = row
-    },
-    // deleteDialogClose(){
-    //   console.log('close');
-    //   this.dialog = false
-    // },
-    deleteEmployee(){
-      // console.log(this.index,this.rowDetail.employee_id);
-      this.instance.delete('/employee/delete/'+this.rowDetail.employee_id)
-      .then((response) => {
-        console.log(response.data)
-        this.view()
-      })
-      this.dialog = false
-    },
-    editEmployee(index, row){
-      // console.log(index, ' : ', row);
-      this.rowId = index
-      this.employee.id = row.employee_id
-      this.employee.name = row.employee_name
-      this.employee.email = row.employee_mail
-      this.employee.phoneNumber = row.employee_number
-      this.employee.departmentId = row.department_id
-      this.employee.departmentName = this.departmentsCheck[this.employee.departmentId]
-      // console.log(this.oldDetails);
-      this.updateButton = true
-      this.submitButton = false
-    },
-    updateEmployee(){
-      // console.log(this.employee.id);
-      let updateDetails = {}
-      updateDetails.employeeId = this.employee.id
-      if(this.employeeDetails[this.rowId].employee_name != this.employee.name){
-        updateDetails.employeeName = this.employee.name
-      }
-      if(this.employeeDetails[this.rowId].employee_mail != this.employee.email){
-        updateDetails.employeeMail = this.employee.email.toLowerCase()
-      }
-      if(this.employeeDetails[this.rowId].employee_number != this.employee.phoneNumber){
-        updateDetails.employeeNumber = this.employee.phoneNumber
-      }
-      if(this.employeeDetails[this.rowId].department_id != this.departments[this.employee.departmentName]){
-        updateDetails.departmentId = this.departments[this.employee.departmentName]
-      }
-      // console.log(updateDetails);
-      this.instance.patch('/employee/update',updateDetails)
-      .then((response) => {
-        console.log(response.data)
-        this.view()
-        this.$refs.form.reset()
-      })
-      this.updateButton = false
-      this.submitButton = true
-    },
-    logout(){
-      localStorage.clear();
-      this.$router.push({ path: "/" })
-    }
-  }
-
 }
 
 </script>
 
-<style scoped>
-h2{
-  color: white
-}
-h1{
-  text-align: center;
-}
-.card{
-  margin-top: 4%;
-  margin-left: 5%; 
-}
-.table{
-  margin-top: 5%;
-}
-.button{
-  margin-top: 10%;
-  text-decoration: none;
-}
+<style>
+  .tree{
+    margin-top: 1%;
+  }
 </style>
-
