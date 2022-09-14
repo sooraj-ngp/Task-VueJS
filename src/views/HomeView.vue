@@ -42,11 +42,6 @@
                 transition
                 @update:active="getTreeData"
               >
-                <template v-slot:prepend="{ item }">
-                  <v-icon v-if="!item.children">
-                    mdi-account
-                  </v-icon>
-                </template>
               </v-treeview>
             </v-col>
 
@@ -100,152 +95,163 @@
     <v-row>
       <v-col></v-col>
       <v-col cols="auto" class="pr-1">
-        <v-simple-table v-if="switchRoomList">
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th class="text-center">
-                  distanceToLocalDb
-                </th>
-                <th class="text-center">
-                  imageFlag
-                </th>
-                <th class="text-center">
-                  localDbRef
-                </th>
-                <th class="text-center">
-                  name
-                </th>
-                <th class="text-center">
-                  networkPointAvailable
-                </th>
-                <th class="text-center">
-                  networkPointToBeInstalled
-                </th>
-                <th class="text-center">
-                  notes
-                </th>
-                <th class="text-center">
-                  routerRequired
-                </th>
-                <th class="text-center">
-                  spareWayAtDb
-                </th>
-                <th class="text-center">
-                  switchRoomId
-                </th>
-                <th class="text-center">
-                  threePhaseRefAvailable
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="item in switchRoomList"
-                :key="item.switchRoomId"
-              >
-                <td class="text-center">{{ (item.distanceToLocalDb && item.distanceToLocalDb!='undefined' && item.distanceToLocalDb != null) ? item.distanceToLocalDb : "No data found"}}</td>
-                <td class="text-center">{{ item.imageFlag && item.imageFlag!='undefined' ? item.imageFlag : "No data found"}}</td>
-                <td class="text-center">{{ item.localDbRef && item.localDbRef!='undefined' ? item.localDbRef : "No data found"}}</td>
-                <td class="text-center">{{ item.name && item.name!='undefined' ? item.name : "No data found"}}</td>
-                <td class="text-center">{{ item.networkPointAvailable && item.networkPointAvailable!='undefined' ? item.networkPointAvailable : "No data found"}}</td>
-                <td class="text-center">{{ item.networkPointToBeInstalled && item.networkPointToBeInstalled!='undefined' ? item.networkPointToBeInstalled : "No data found"}}</td>
-                <td class="text-center">{{ item.notes && item.notes!='undefined' ? item.notes : "No data found"}}</td>
-                <td class="text-center">{{ item.routerRequired && item.routerRequired!='undefined' ? item.routerRequired : "No data found"}}</td>
-                <td class="text-center">{{ item.spareWayAtDb && item.spareWayAtDb!='undefined' ? item.spareWayAtDb : "No data found"}}</td>
-                <td class="text-center">{{ item.switchRoomId && item.switchRoomId!='undefined' ? item.switchRoomId : "No data found"}}</td>
-                <td class="text-center">{{ item.threePhaseRefAvailable && item.threePhaseRefAvailable!='undefined' ? item.threePhaseRefAvailable : "No data found"}}</td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-        <v-simple-table v-if="channelList">
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th class="text-center">
-                  Channel Id
-                </th>
-                <th class="text-center">
-                  Created By
-                </th>
-                <th class="text-center">
-                  Phase
-                </th>
-                <th class="text-center">
-                  Phase Type
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="item in channelList"
-                :key="item.channelId"
-              >
-                <td class="text-center">{{ item.channelId }}</td>
-                <td class="text-center">{{ item.createdBy }}</td>
-                <td class="text-left ml-5">
-                  <span v-for="phaseItem,index in item.phase" :key="index">
-                  <span v-for="phaseInnerItem, innerKey, index in phaseItem" :key="index">
-                      {{ innerKey }} : {{ phaseInnerItem }}<br>
-                  </span>
-                  </span>
-                </td>
-                <td class="text-center">{{ item.phaseType }}</td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-        <v-simple-table v-if="site">
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th class="text-center">
-                  add2
-                </th>
-                <th class="text-center">
-                  city
-                </th>
-                <th class="text-center">
-                  country
-                </th>
-                <th class="text-center">
-                  line_1
-                </th>
-                <th class="text-center">
-                  line_2
-                </th>
-                <th class="text-center">
-                  postcode
-                </th>
-                <th class="text-center">
-                  road
-                </th>
-                <th class="text-center">
-                  site_name
-                </th>
-                <th class="text-center">
-                  town
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <!-- v-for="item in site"
-                :key="item.site_name" -->
-                <td class="text-center"> {{ site.add2 && site.add2!=null ? site.add2 : "No data found"}} </td>
-                <td class="text-center"> {{ site.city && site.city!=null ? site.city : "No data found" }} </td>
-                <td class="text-center"> {{ site.country && site.country!=null ? site.country : "No data found" }} </td>
-                <td class="text-center"> {{ site.line_1 && site.line_1!=null ? site.line_1 : "No data found" }} </td>
-                <td class="text-center"> {{ site.line_2 && site.line_2!=null ? site.line_2 : "No data found" }} </td>
-                <td class="text-center"> {{ site.postcode && site.postcode!=null ? site.postcode : "No data found" }} </td>
-                <td class="text-center"> {{ site.road && site.road!=null ? site.road : "No data found" }} </td>
-                <td class="text-center"> {{ site.site_name && site.site_name!=null ? site.site_name : "No data found" }} </td>
-                <td class="text-center"> {{ site.town && site.town!=null ? site.town : "No data found" }} </td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
+        <v-row>
+          <v-col></v-col>
+          <v-col>
+            <h2 class="text-center tableHeading" v-if="switchRoomList">Switch Room List</h2>
+            <h2 class="text-center tableHeading" v-if="channelList">Channel List</h2>
+            <h2 class="text-center tableHeading" v-if="site">Site</h2>
+          </v-col>
+          <v-col></v-col>
+        </v-row>
+        <v-row>
+          <v-simple-table v-if="switchRoomList">
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-center">
+                    distanceToLocalDb
+                  </th>
+                  <th class="text-center">
+                    imageFlag
+                  </th>
+                  <th class="text-center">
+                    localDbRef
+                  </th>
+                  <th class="text-center">
+                    name
+                  </th>
+                  <th class="text-center">
+                    networkPointAvailable
+                  </th>
+                  <th class="text-center">
+                    networkPointToBeInstalled
+                  </th>
+                  <th class="text-center">
+                    notes
+                  </th>
+                  <th class="text-center">
+                    routerRequired
+                  </th>
+                  <th class="text-center">
+                    spareWayAtDb
+                  </th>
+                  <th class="text-center">
+                    switchRoomId
+                  </th>
+                  <th class="text-center">
+                    threePhaseRefAvailable
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="item in switchRoomList"
+                  :key="item.switchRoomId"
+                >
+                  <td class="text-center">{{ (item.distanceToLocalDb && item.distanceToLocalDb!='undefined' && item.distanceToLocalDb != null) ? item.distanceToLocalDb : "No data found"}}</td>
+                  <td class="text-center">{{ item.imageFlag && item.imageFlag!='undefined' ? item.imageFlag : "No data found"}}</td>
+                  <td class="text-center">{{ item.localDbRef && item.localDbRef!='undefined' ? item.localDbRef : "No data found"}}</td>
+                  <td class="text-center">{{ item.name && item.name!='undefined' ? item.name : "No data found"}}</td>
+                  <td class="text-center">{{ item.networkPointAvailable && item.networkPointAvailable!='undefined' ? item.networkPointAvailable : "No data found"}}</td>
+                  <td class="text-center">{{ item.networkPointToBeInstalled && item.networkPointToBeInstalled!='undefined' ? item.networkPointToBeInstalled : "No data found"}}</td>
+                  <td class="text-center">{{ item.notes && item.notes!='undefined' ? item.notes : "No data found"}}</td>
+                  <td class="text-center">{{ item.routerRequired && item.routerRequired!='undefined' ? item.routerRequired : "No data found"}}</td>
+                  <td class="text-center">{{ item.spareWayAtDb && item.spareWayAtDb!='undefined' ? item.spareWayAtDb : "No data found"}}</td>
+                  <td class="text-center">{{ item.switchRoomId && item.switchRoomId!='undefined' ? item.switchRoomId : "No data found"}}</td>
+                  <td class="text-center">{{ item.threePhaseRefAvailable && item.threePhaseRefAvailable!='undefined' ? item.threePhaseRefAvailable : "No data found"}}</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+          <v-simple-table v-if="channelList">
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-center">
+                    Channel Id
+                  </th>
+                  <th class="text-center">
+                    Created By
+                  </th>
+                  <th class="text-center">
+                    Phase
+                  </th>
+                  <th class="text-center">
+                    Phase Type
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="item in channelList"
+                  :key="item.channelId"
+                >
+                  <td class="text-center">{{ item.channelId }}</td>
+                  <td class="text-center">{{ item.createdBy }}</td>
+                  <td class="text-left ml-5">
+                    <span v-for="phaseItem,index in item.phase" :key="index">
+                    <span v-for="phaseInnerItem, innerKey, index in phaseItem" :key="index">
+                        {{ innerKey }} : {{ phaseInnerItem }}<br>
+                    </span>
+                    </span>
+                  </td>
+                  <td class="text-center">{{ item.phaseType }}</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+          <v-simple-table v-if="site">
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-center">
+                    add2
+                  </th>
+                  <th class="text-center">
+                    city
+                  </th>
+                  <th class="text-center">
+                    country
+                  </th>
+                  <th class="text-center">
+                    line_1
+                  </th>
+                  <th class="text-center">
+                    line_2
+                  </th>
+                  <th class="text-center">
+                    postcode
+                  </th>
+                  <th class="text-center">
+                    road
+                  </th>
+                  <th class="text-center">
+                    site_name
+                  </th>
+                  <th class="text-center">
+                    town
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <!-- v-for="item in site"
+                  :key="item.site_name" -->
+                  <td class="text-center"> {{ site.add2 && site.add2!=null ? site.add2 : "No data found"}} </td>
+                  <td class="text-center"> {{ site.city && site.city!=null ? site.city : "No data found" }} </td>
+                  <td class="text-center"> {{ site.country && site.country!=null ? site.country : "No data found" }} </td>
+                  <td class="text-center"> {{ site.line_1 && site.line_1!=null ? site.line_1 : "No data found" }} </td>
+                  <td class="text-center"> {{ site.line_2 && site.line_2!=null ? site.line_2 : "No data found" }} </td>
+                  <td class="text-center"> {{ site.postcode && site.postcode!=null ? site.postcode : "No data found" }} </td>
+                  <td class="text-center"> {{ site.road && site.road!=null ? site.road : "No data found" }} </td>
+                  <td class="text-center"> {{ site.site_name && site.site_name!=null ? site.site_name : "No data found" }} </td>
+                  <td class="text-center"> {{ site.town && site.town!=null ? site.town : "No data found" }} </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-row>
       </v-col>
       <v-col></v-col>
     </v-row>
@@ -676,5 +682,8 @@ export default {
 <style>
   .tree{
     margin-top: 1%;
+  }
+  .tableHeading{
+    font-size: 20px;
   }
 </style>
