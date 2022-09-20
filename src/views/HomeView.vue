@@ -4,6 +4,8 @@
     <v-row>
       <v-col>
         <h2>Hello {{user}}!</h2>
+        <!-- <h2>{{ state.firstName }} {{ state.lastName }}</h2> -->
+    
         <v-row>
         <v-col
         cols="5 ">
@@ -78,7 +80,7 @@
                 >Submit</v-btn>
                 <v-btn
                   color="primary"
-                  v-if="updateButton"
+                  v-if="!submitButton"
                   @click="updateEmployee">
                   Update
                 </v-btn>
@@ -178,7 +180,8 @@
           </v-row>
           <v-row>
             <v-col></v-col>
-              <h2>Total Count: {{ employeeDetails.length }}</h2>
+              <h2>Total Count: {{ recordCount }}</h2>
+              <!-- <h2>{{ employeeDetails }}</h2> -->
             <v-col></v-col>
           </v-row>
           </div>
@@ -202,7 +205,13 @@ import {
   mdiDelete,
 } from '@mdi/js'
 
-import axios from 'axios';
+// import axios from 'axios';
+// import { createApp } from 'vue'
+// import App from '@/App.vue'
+// import { createStore } from 'vuex'
+// import store from '@/store';
+import { mapActions, mapGetters } from 'vuex'
+// createApp(App).use(store).mount('#app')
 
 export default {
   data(){
@@ -224,12 +233,9 @@ export default {
       searchString: '',
       alertMessage: false,
       valid: true,
-      updateButton:false,
       submitButton:true,
       dialog: false,
       instance: null,
-      employeeDetails: [],
-      departmentDetails: [],
       rowId: 0,
       rowDetail: [],
       snackbar: false,
@@ -253,9 +259,7 @@ export default {
         phoneNumber: [val => (val != '' && val != null) || 'Phone Number is required', val => (!val) || /^[0-9]+$/.test(val) || 'Phone Number must be in numbers only'],
         departmentName: [val => (val != '' && val != null) || 'Department is required'], 
       },
-      departments: {},
-      departmentsCheck: [],
-      departmentNames: [],
+      // departmentIdNames: [],
       details: [],
       userDetails: [],
       newDetails: {},
@@ -265,57 +269,25 @@ export default {
   watch:{
     searchString(value){
       this.searchString = value
-      if(this.searchString){
-        this.instance.get('/employee/selectAll/'+this.searchString)
-        .then((response) => {
-          this.employeeDetails = response.data
-          // console.log(this.employeeDetails);
-        })
-      }
-      else if(this.searchString == ''){
-        this.instance.get('/employee/selectAll/'+this.searchString)
-        .then((response) => {
-          this.employeeDetails = response.data
-          // console.log(this.employeeDetails);
-        })
+      if(this.searchString || this.searchString == ''){
+        this.stringSearch(this.searchString)
       }
 
     }
   },
   mounted() {
-    this.instance = axios.create({
-      baseURL: 'http://127.0.0.1:3333',
-      headers:{
-        'Content-type': 'application/json',
-        'AppKey':'0ba5ntcQizGig4A0W6FytENeoFiwnvTS'
-      }
-    })
+    // console.log('mounted');
     if(!localStorage.getItem('user')){
       // console.log('hello',localStorage.getItem('user'));
       this.$router.push({ path: "/" })
     }
     else{
-      this.instance.get('/employee/selectAll')
-      .then((response) => {
-        this.employeeDetails = response.data
-        // console.log(this.employeeDetails);
-      })
       const index = localStorage.getItem('user').indexOf('@')
       // console.log(localStorage.getItem('user').slice(0,index))
       this.user = localStorage.getItem('user').charAt(0).toUpperCase() + localStorage.getItem('user').slice(1, index)
-      this.instance.get('/department/selectAll')
-      .then((response) => {
-        // console.log(response.data)
-        this.departmentDetails = response.data
-        for(let i=0; i<this.departmentDetails.length; i++){
-          this.departments[this.departmentDetails[i].department_name] = this.departmentDetails[i].department_id
-          this.departmentsCheck[this.departmentDetails[i].department_id] = this.departmentDetails[i].department_name
-          this.departmentNames.push(this.departmentDetails[i].department_name)
-        }
-        // console.log(this.departments);
-        // console.log(this.departmentsCheck);
-        // console.log(this.departmentNames);
-      })
+      this.getEmployeeDetails()   
+      this.getDepartmentDetails()
+      // console.log(this.departmentDetails)
     }
   },
   filters: {
@@ -335,6 +307,10 @@ export default {
       }
     },
   computed:{
+    ...mapGetters("employeeInfo",[
+      'employeeDetails', 'departmentDetails', 'recordCount', 'departments', 'departmentsCheck ', 
+      'departmentNames', 'departmentName', 'departmentId' 
+    ]),
     isSubmitDisabled() {
       if(!this.employee.name || !this.employee.email || !this.employee.phoneNumber || !this.employee.departmentName){
         return true
@@ -347,6 +323,10 @@ export default {
     },
   },  
   methods:{
+    ...mapActions("employeeInfo",[
+      'getEmployeeDetails', 'getDepartmentDetails', 'insertEmployeeDetail', 'deleteEmployeeDetail', 
+      'updateEmployeeDetail', 'getDepartmentName', 'getDepartmentId', 'stringSearch'
+    ]),
     view(){ 
       this.instance.get('/employee/selectAll')
       .then((response) => {
@@ -363,40 +343,31 @@ export default {
         this.snackbar = false
         this.employee.departmentId = this.departments[this.employee.departmentName]
         // console.log(this.employee.departmentId)
-      
-        this.instance.post('/employee/insert',{
+        this.insertEmployeeDetail({
           employeeName: this.employee.name,
           employeeMail: this.employee.email.toLowerCase(),
           employeeNumber: this.employee.phoneNumber,
           departmentId: this.employee.departmentId
-        }).then((response) => {
-          console.log(response.data)
-          this.view()
-          this.$refs.form.reset()
         })
+        this.getEmployeeDetails()
+        this.$refs.form.reset()
       }
     },
     reset(){
       this.$refs.form.reset()
-      this.updateButton = false
       this.submitButton = true
     },
-    deleteDialogClick(index, row){
+    deleteDialogClick(row){
       // console.log('click');
       this.dialog = true
       this.rowDetail = row
     },
-    // deleteDialogClose(){
-    //   console.log('close');
-    //   this.dialog = false
-    // },
     deleteEmployee(){
       // console.log(this.index,this.rowDetail.employee_id);
-      this.instance.delete('/employee/delete/'+this.rowDetail.employee_id)
-      .then((response) => {
-        console.log(response.data)
-        this.view()
-      })
+      this.deleteEmployeeDetail(this.rowDetail.employee_id)
+      this.getEmployeeDetails()
+      this.$refs.form.reset()
+      this.submitButton = true
       this.dialog = false
     },
     editEmployee(index, row){
@@ -407,9 +378,11 @@ export default {
       this.employee.email = row.employee_mail
       this.employee.phoneNumber = row.employee_number
       this.employee.departmentId = row.department_id
-      this.employee.departmentName = this.departmentsCheck[this.employee.departmentId]
+      // console.log(this.$store.state.departmentsCheck)
+      this.getDepartmentName(this.employee.departmentId)
+      this.employee.departmentName = this.departmentName
+      // this.employee.departmentName = this.departmentsCheck[this.employee.departmentId]
       // console.log(this.oldDetails);
-      this.updateButton = true
       this.submitButton = false
     },
     updateEmployee(){
@@ -426,16 +399,13 @@ export default {
         updateDetails.employeeNumber = this.employee.phoneNumber
       }
       if(this.employeeDetails[this.rowId].department_id != this.departments[this.employee.departmentName]){
-        updateDetails.departmentId = this.departments[this.employee.departmentName]
+        this.getDepartmentId(this.employee.departmentName)
+        updateDetails.departmentId = this.departmentId
       }
       // console.log(updateDetails);
-      this.instance.patch('/employee/update',updateDetails)
-      .then((response) => {
-        console.log(response.data)
-        this.view()
-        this.$refs.form.reset()
-      })
-      this.updateButton = false
+      this.updateEmployeeDetail(updateDetails)
+      this.getEmployeeDetails()
+      this.$refs.form.reset()
       this.submitButton = true
     },
     logout(){
